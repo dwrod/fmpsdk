@@ -3,6 +3,7 @@ import os
 import requests
 import logging
 from bs4 import BeautifulSoup
+import re
 
 from .settings import (
     INCOME_STATEMENT_FILENAME,
@@ -378,45 +379,114 @@ def sec_filings(
     return __return_json_v3(path=path, query_vars=query_vars)
 
 
-def sec_filings_data(
-    symbol: str,
-    filing_type: str = "",
-    limit: int = 1,
-    output: str = 'markdown'
-) -> typing.Union[typing.List[typing.Dict], str]:
-    """
-    Retrieve a company's SEC filings and fetch the content from 'finalLink'.
+def clean_html_content(soup):
+    """Convert SEC filing HTML to clean Markdown while preserving document flow."""
+    # Remove XBRL and metadata elements
+    for element in soup.find_all(['ix:header', 'ix:hidden', 'ix:references', 'ix:resources']):
+        element.decompose()
+    
+    # Get the main content - look specifically for the filing content
+    body = soup.find('body')
+    if not body:
+        return None
+        
+    def process_element(element):
+        """Process each element and convert to appropriate Markdown."""
+        if element.name in ['script', 'style']:
+            return ''
+            
+        # Handle headings
+        if element.name in ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']:
+            level = int(element.name[1])
+            return f"{'#' * level} {element.get_text().strip()}\n\n"
+            
+        # Handle paragraphs and div blocks
+        if element.name in ['p', 'div']:
+            text = element.get_text().strip()
+            if not text:
+                return ''
+                
+            # Check for styling
+            style = element.get('style', '')
+            if 'text-align:center' in style:
+                return f"\n<center>{text}</center>\n\n"
+            if 'font-weight:700' in style or 'font-weight:bold' in style:
+                text = f"**{text}**"
+            if 'font-style:italic' in style:
+                text = f"*{text}*"
+                
+            return f"{text}\n\n"
+            
+        # Handle lists
+        if element.name in ['ul', 'ol']:
+            items = []
+            for li in element.find_all('li', recursive=False):
+                prefix = '* ' if element.name == 'ul' else '1. '
+                items.append(f"{prefix}{li.get_text().strip()}")
+            return '\n'.join(items) + '\n\n'
+            
+        # Handle tables more naturally - convert to text blocks if they're not data tables
+        if element.name == 'table':
+            # Check if this is a signature/header table or data table
+            if 'signature' in str(element).lower() or len(element.find_all('tr')) < 3:
+                text_blocks = []
+                for row in element.find_all('tr'):
+                    cells = [cell.get_text().strip() for cell in row.find_all(['td', 'th'])]
+                    text_blocks.extend(cell for cell in cells if cell)
+                return '\n\n'.join(text_blocks) + '\n\n'
+            else:
+                # Preserve as table for actual tabular data
+                return str(element) + '\n\n'
+        
+        # Recursively process child elements
+        return ''.join(process_element(child) for child in element.children if hasattr(child, 'name'))
+    
+    # Process the document
+    markdown_content = process_element(body)
+    
+    # Clean up extra whitespace and line breaks
+    markdown_content = re.sub(r'\n{3,}', '\n\n', markdown_content)
+    markdown_content = re.sub(r'^\s+', '', markdown_content)
+    
+    return markdown_content
 
-    Provides access to important financial documents and regulatory filings,
-    along with the content of the filings.
-
-    :param symbol: Company ticker (e.g., 'AAPL').
+def sec_filings_data(symbol, filing_type='10-K', limit=1):
+    """:param symbol: Company ticker (e.g., 'AAPL').
     :param filing_type: SEC filing type (e.g., '10-K', '10-Q', '8-K'). Default is all types.
     :param limit: Number of records to retrieve. Default is 1.
-    NOTE to LLM's: Limit to 2 record at a time.
-    :param output: Output format ('tsv', 'json', or 'markdown'). Defaults to 'markdown'.
-    :return: List of dicts or formatted string with SEC filings data, including the content.
-    :example: sec_filings_data('AAPL', filing_type='10-K', limit=2)
+    NOTE to LLM's: Limit to maximum of 2 records at a time.
+    :return: Final content of the filing rendered as clean Markdown
+    :example: sec_filings_data('AAPL', filing_type='10-K', limit=1)
     Note: This function returns unredacted full text of the filings and 
     may not be suitable for LLM processing without very long context windows.
     """
     filings = sec_filings(symbol, filing_type, limit)
     
-    if filings is None:
+    if not filings:
         return None
 
     headers = {'User-Agent': SEC_USER_AGENT}
-
+    finalcontent = """"""
+    # Process only the first filing (or up to limit)
     for filing in filings:
         final_link = filing.get('finalLink')
+
         if final_link:
             try:
                 response = requests.get(final_link, headers=headers)
                 response.raise_for_status()
                 
                 soup = BeautifulSoup(response.content, 'html.parser')
-                filing['content'] = clean_html_content(soup)
-            except requests.RequestException as e:
-                filing['content'] = f"Error fetching content: {str(e)}"
+                content = clean_html_content(soup)
+                
+                # Return just the formatted content with minimal metadata
+                finalcontent += (f"""\n # {symbol} {filing_type} Filing
+                Date: {filing.get('fillingDate')}
+                Link: {final_link}
 
-    return format_output(filings, output)
+                ---
+
+                {content}""")                
+            except requests.RequestException as e:
+                finalcontent.append(f"Error fetching content: {str(e)}")
+    return finalcontent

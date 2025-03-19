@@ -2,8 +2,10 @@ import typing
 import os
 import requests
 import logging
+import traceback
 from bs4 import BeautifulSoup
 import re
+from bs4.element import NavigableString
 
 from .settings import (
     INCOME_STATEMENT_FILENAME,
@@ -382,16 +384,32 @@ def sec_filings(
 def clean_html_content(soup):
     """Convert SEC filing HTML to clean Markdown while preserving document flow."""
     # Remove XBRL and metadata elements
-    for element in soup.find_all(['ix:header', 'ix:hidden', 'ix:references', 'ix:resources']):
-        element.decompose()
+    try:
+        for element in soup.find_all(['ix:header', 'ix:hidden', 'ix:references', 'ix:resources']):
+            element.decompose()
+    except Exception as e:
+        print(f"Error removing XBRL elements: {str(e)}")
     
     # Get the main content - look specifically for the filing content
     body = soup.find('body')
     if not body:
-        return None
+        # Try to find the main content area if body tag is missing
+        body = soup.find('div', id='main-content')
+        if not body:
+            body = soup.find('div', class_='filing')
+            if not body:
+                # Fall back to the entire document
+                body = soup
+                
+    if body is None:
+        return "Error: Could not locate document body."
         
     def process_element(element):
         """Process each element and convert to appropriate Markdown."""
+        # Handle NavigableString objects (text nodes)
+        if isinstance(element, NavigableString):
+            return str(element)
+            
         if element.name in ['script', 'style']:
             return ''
             
@@ -439,7 +457,7 @@ def clean_html_content(soup):
                 return str(element) + '\n\n'
         
         # Recursively process child elements
-        return ''.join(process_element(child) for child in element.children if hasattr(child, 'name'))
+        return ''.join(process_element(child) for child in element.children)
     
     # Process the document
     markdown_content = process_element(body)
@@ -463,7 +481,7 @@ def sec_filings_data(symbol, filing_type='10-K', limit=1):
     filings = sec_filings(symbol, filing_type, limit)
     
     if not filings:
-        return None
+        return {"error": f"No {filing_type} filings found for {symbol}"}
 
     headers = {'User-Agent': SEC_USER_AGENT}
     finalcontent = """"""
@@ -477,7 +495,15 @@ def sec_filings_data(symbol, filing_type='10-K', limit=1):
                 response.raise_for_status()
                 
                 soup = BeautifulSoup(response.content, 'html.parser')
-                content = clean_html_content(soup)
+                
+                try:
+                    content = clean_html_content(soup)
+                    if not content:
+                        content = f"Unable to extract content from HTML for {symbol} {filing_type}."
+                except Exception as process_error:
+                    error_msg = f"Error processing HTML content: {str(process_error)}\n{traceback.format_exc()}"
+                    print(error_msg)  # Log the error
+                    content = f"Error processing filing content: {str(process_error)}"
                 
                 # Return just the formatted content with minimal metadata
                 finalcontent += (f"""\n # {symbol} {filing_type} Filing
@@ -488,5 +514,8 @@ def sec_filings_data(symbol, filing_type='10-K', limit=1):
 
                 {content}""")                
             except requests.RequestException as e:
-                finalcontent.append(f"Error fetching content: {str(e)}")
-    return finalcontent
+                finalcontent += f"\nError retrieving {filing_type} filing for {symbol}: {str(e)}"
+        else:
+            finalcontent += f"\nNo direct link available for {filing_type} filing of {symbol}"
+    
+    return finalcontent or {"error": f"Failed to retrieve content for {symbol} {filing_type} filings"}

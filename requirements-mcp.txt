@@ -1,0 +1,7 @@
+# MCP Server Dependencies
+mcp>=1.0.0
+ 
+# Your existing fmpsdk dependencies (from requirements.txt)
+requests>=2.25.1
+beautifulsoup4>=4.9.3
+python-dotenv>=0.19.0 

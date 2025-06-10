@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "fmpsdk": {
+      "command": "python",
+      "args": ["fmpsdk_mcp_server.py"],
+      "env": {
+        "FMP_API_KEY": "${FMP_API_KEY}",
+        "SEC_USER_AGENT": "${SEC_USER_AGENT}"
+      }
+    }
+  }
+} 

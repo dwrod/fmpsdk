@@ -104,6 +104,7 @@ def analyst_estimates(
 def sales_revenue_by_segments(
     symbol: str,
     period: str = "quarter",
+    limit: int = None,
     output: str = 'markdown'
 ) -> Union[List[Dict], str]:
     """
@@ -114,9 +115,10 @@ def sales_revenue_by_segments(
 
     :param symbol: The stock symbol of the company (e.g., 'AAPL' for Apple Inc.)
     :param period: The period of the data. Can be 'annual' or 'quarter' (default is 'quarter')
+    :param limit: Optional limit on the number of results to return
     :param output: Output format ('tsv', 'json', or 'markdown'). Defaults to 'markdown'.
     :return: Sales revenue by segments data in the specified format.
-    :example: sales_revenue_by_segments('AAPL', period='quarter')
+    :example: sales_revenue_by_segments('AAPL', period='quarter', limit=4)
     """
     path = "revenue-product-segmentation"
     query_vars = {
@@ -125,6 +127,8 @@ def sales_revenue_by_segments(
         "structure": "flat",
         "period": period
     }
+    if limit is not None:
+        query_vars["limit"] = limit
     result = __return_json_v4(path=path, query_vars=query_vars)
     if output != 'json':
         # Format the result into a list of dictionaries compatible with TSV conversion

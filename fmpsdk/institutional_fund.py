@@ -130,7 +130,8 @@ def sec_rss_feeds(
     if download:
         query_vars["datatype"] = "csv"  # Only CSV is supported.
         response = requests.get(f"{BASE_URL_v3}{path}", params=query_vars)
-        open(filename, "wb").write(response.content)
+        with open(filename, "wb") as f:
+            f.write(response.content)
         return None
     else:
         query_vars["limit"] = limit

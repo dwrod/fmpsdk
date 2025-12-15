@@ -65,6 +65,8 @@ from .company_valuation import (
     historical_employee_count,
     employee_count,
     analyst_recommendation,
+    ratings_snapshot,
+    grades_consensus,
 )
 
 from .crowdfunding import (
@@ -99,6 +101,11 @@ from .financial_statements import (
     earning_call_transcripts_available_dates,
     sec_filings,
     sec_filings_data,
+    income_statement_ttm,
+    balance_sheet_statement_ttm,
+    cash_flow_statement_ttm,
+    latest_financial_statements,
+    earning_call_transcript_latest,
 )
 from .insider_trading import (
     insider_trading, 
@@ -161,6 +168,8 @@ from .quote import (
     forex_quote,
     historical_chart,
     historical_price_full,
+    aftermarket_trade,
+    aftermarket_quote,
 )
 from .search_functions import search, search_ticker
 from .senate import (
@@ -187,6 +196,8 @@ from .stock_market import (
     batch_eod_prices,
     multiple_company_prices,
     historical_sectors_performance,
+    industry_performance_snapshot,
+    holidays_by_exchange,
 )
 from .stock_screener import stock_screener
 from .stock_time_series import (
@@ -203,12 +214,27 @@ from .valuation_metrics import (
     historical_market_capitalization,
 )
 
+from .fmp_registry import (
+    FMPEndpoint,
+    FMP_REGISTRY,
+    CATEGORIES,
+    get_endpoints_by_category,
+    get_all_categories,
+    get_registry_for_llm,
+    get_compact_registry_for_llm,
+    search_endpoints,
+)
+
+from .url_methods import FMPAPIError
+
 attribution: str = "Data provided by Financial Modeling Prep"
 logging.info(attribution)
 
 __all__ = [
     "actives",
     "advanced_discounted_cash_flow",
+    "aftermarket_quote",
+    "aftermarket_trade",
     "all_countries",
     "analyst_estimates",
     "analyst_recommendation",
@@ -227,11 +253,13 @@ __all__ = [
     "balance_sheet_statement",
     "balance_sheet_statement_as_reported",
     "balance_sheet_statement_growth",
+    "balance_sheet_statement_ttm",
     "batch_earning_call_transcript",
     "batch_eod_prices",
     "cash_flow_statement",
     "cash_flow_statement_as_reported",
     "cash_flow_statement_growth",
+    "cash_flow_statement_ttm",
     "cik",
     "cik_list",
     "cik_search",
@@ -256,6 +284,7 @@ __all__ = [
     "dividend_calendar",
     "dowjones_constituent",
     "earning_call_transcript",
+    "earning_call_transcript_latest",
     "earning_call_transcripts_available_dates",
     "earning_calendar",
     "earnings_surprises",
@@ -278,6 +307,7 @@ __all__ = [
     "financial_statement_full_as_reported",
     "financial_statement_symbol_lists",
     "fmp_articles",
+    "FMPAPIError",
     "form_13f",
     "forex",
     "forex_historical",
@@ -285,6 +315,7 @@ __all__ = [
     "forex_quote",
     "gainers",
     "general_news",
+    "grades_consensus",
     "historical_chart",
     "historical_daily_discounted_cash_flow",
     "historical_dowjones_constituent",
@@ -296,6 +327,7 @@ __all__ = [
     "historical_rating",
     "historical_sectors_performance",
     "historical_share_float",
+    "holidays_by_exchange",
     "historical_social_sentiment",
     "historical_sp500_constituent",
     "historical_stock_dividend",
@@ -303,8 +335,10 @@ __all__ = [
     "income_statement",
     "income_statement_as_reported",
     "income_statement_growth",
+    "income_statement_ttm",
     "indexes",
     "industry_pe_ratio",
+    "industry_performance_snapshot",
     "insider_trading",
     "insider_trading_rss_feed",
     "institutional_holders",
@@ -313,6 +347,7 @@ __all__ = [
     "key_executives",
     "key_metrics",
     "key_metrics_ttm",
+    "latest_financial_statements",
     "losers",
     "mapper_cik_company",
     "mapper_cik_name",
@@ -335,6 +370,7 @@ __all__ = [
     "quote",
     "quote_short",
     "rating",
+    "ratings_snapshot",
     "revenue_geographic_segmentation",
     "sales_revenue_by_segments",
     "search",
@@ -366,4 +402,13 @@ __all__ = [
     "upgrades_downgrades_by_company",
     "upgrades_downgrades_consensus",
     "upgrades_downgrades_rss_feed",
+    # Registry exports
+    "FMPEndpoint",
+    "FMP_REGISTRY",
+    "CATEGORIES",
+    "get_endpoints_by_category",
+    "get_all_categories",
+    "get_registry_for_llm",
+    "get_compact_registry_for_llm",
+    "search_endpoints",
 ]

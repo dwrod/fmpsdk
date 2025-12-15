@@ -1,7 +1,7 @@
 import typing
 import os
 from .settings import DEFAULT_LIMIT
-from .url_methods import __return_json_v3, __return_json_v4, __validate_period
+from .url_methods import __return_json_v3, __return_json_v4, __return_json_stable, __validate_period
 from .data_compression import format_output
 from typing import List, Dict, Union
 
@@ -439,4 +439,46 @@ def analyst_recommendation(
     path = f"analyst-stock-recommendations/{symbol}"
     query_vars = {"apikey": API_KEY}
     result = __return_json_v3(path=path, query_vars=query_vars)
+    return format_output(result, output)
+
+
+def ratings_snapshot(
+    symbol: str,
+    output: str = 'markdown'
+) -> Union[List[Dict], str]:
+    """
+    Retrieve a snapshot of analyst ratings for a company.
+
+    Provides a quick summary of buy, hold, sell, and strong buy/sell recommendations
+    from analysts, useful for gauging overall market sentiment.
+
+    :param symbol: Company ticker (e.g., 'AAPL').
+    :param output: Output format ('tsv', 'json', or 'markdown'). Defaults to 'markdown'.
+    :return: Ratings snapshot data in the specified format.
+    :example: ratings_snapshot('AAPL')
+    """
+    path = "ratings-snapshot"
+    query_vars = {"apikey": API_KEY, "symbol": symbol}
+    result = __return_json_stable(path=path, query_vars=query_vars)
+    return format_output(result, output)
+
+
+def grades_consensus(
+    symbol: str,
+    output: str = 'markdown'
+) -> Union[List[Dict], str]:
+    """
+    Retrieve the consensus grade for a company from analyst ratings.
+
+    Provides an aggregated view of analyst grades including the consensus
+    recommendation (buy, hold, sell) based on all analyst inputs.
+
+    :param symbol: Company ticker (e.g., 'AAPL').
+    :param output: Output format ('tsv', 'json', or 'markdown'). Defaults to 'markdown'.
+    :return: Grades consensus data in the specified format.
+    :example: grades_consensus('AAPL')
+    """
+    path = "grades-consensus"
+    query_vars = {"apikey": API_KEY, "symbol": symbol}
+    result = __return_json_stable(path=path, query_vars=query_vars)
     return format_output(result, output)

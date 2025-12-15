@@ -59,7 +59,8 @@ def income_statement(
     if download:
         query_vars["datatype"] = "csv"  # Only CSV is supported.
         response = requests.get(f"{BASE_URL_v3}{path}", params=query_vars)
-        open(filename, "wb").write(response.content)
+        with open(filename, "wb") as f:
+            f.write(response.content)
         logging.info(f"Saving {symbol} financial statement as {filename}.")
         return None
     else:
@@ -96,7 +97,8 @@ def balance_sheet_statement(
     if download:
         query_vars["datatype"] = "csv"  # Only CSV is supported.
         response = requests.get(f"{BASE_URL_v3}{path}", params=query_vars)
-        open(filename, "wb").write(response.content)
+        with open(filename, "wb") as f:
+            f.write(response.content)
         logging.info(f"Saving {symbol} balance sheet statement as {filename}.")
         return None
     else:
@@ -133,7 +135,8 @@ def cash_flow_statement(
     if download:
         query_vars["datatype"] = "csv"  # Only CSV is supported.
         response = requests.get(f"{BASE_URL_v3}{path}", params=query_vars)
-        open(filename, "wb").write(response.content)
+        with open(filename, "wb") as f:
+            f.write(response.content)
         logging.info(f"Saving {symbol} financial statement as {filename}.")
         return None
     else:
@@ -170,7 +173,8 @@ def income_statement_as_reported(
     if download:
         query_vars["datatype"] = "csv"  # Only CSV is supported.
         response = requests.get(f"{BASE_URL_v3}{path}", params=query_vars)
-        open(filename, "wb").write(response.content)
+        with open(filename, "wb") as f:
+            f.write(response.content)
         logging.info(f"Saving {symbol} financial statement as {filename}.")
         return None
     else:
@@ -206,7 +210,8 @@ def balance_sheet_statement_as_reported(
     if download:
         query_vars["datatype"] = "csv"  # Only CSV is supported.
         response = requests.get(f"{BASE_URL_v3}{path}", params=query_vars)
-        open(filename, "wb").write(response.content)
+        with open(filename, "wb") as f:
+            f.write(response.content)
         logging.info(f"Saving {symbol} financial statement as {filename}.")
         return None
     else:
@@ -242,7 +247,8 @@ def cash_flow_statement_as_reported(
     if download:
         query_vars["datatype"] = "csv"  # Only CSV is supported.
         response = requests.get(f"{BASE_URL_v3}{path}", params=query_vars)
-        open(filename, "wb").write(response.content)
+        with open(filename, "wb") as f:
+            f.write(response.content)
         logging.info(f"Saving {symbol} financial statement as {filename}.")
         return None
     else:

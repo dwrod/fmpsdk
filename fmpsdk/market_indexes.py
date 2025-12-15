@@ -50,7 +50,8 @@ def sp500_constituent(
     if download:
         query_vars["datatype"] = "csv"  # Only CSV is supported.
         response = requests.get(f"{BASE_URL_v3}{path}", params=query_vars)
-        open(filename, "wb").write(response.content)
+        with open(filename, "wb") as f:
+            f.write(response.content)
         logging.info(f"Saving SP500 Constituents as {filename}.")
         return None
     else:
@@ -87,7 +88,8 @@ def nasdaq_constituent(
     if download:
         query_vars["datatype"] = "csv"  # Only CSV is supported.
         response = requests.get(f"{BASE_URL_v3}{path}", params=query_vars)
-        open(filename, "wb").write(response.content)
+        with open(filename, "wb") as f:
+            f.write(response.content)
         logging.info(f"Saving NASDAQ Constituents as {filename}.")
         return None
     else:
@@ -124,7 +126,8 @@ def dowjones_constituent(
     if download:
         query_vars["datatype"] = "csv"  # Only CSV is supported.
         response = requests.get(f"{BASE_URL_v3}{path}", params=query_vars)
-        open(filename, "wb").write(response.content)
+        with open(filename, "wb") as f:
+            f.write(response.content)
         logging.info(f"Saving DOWJONES Constituents as {filename}.")
         return None
     else:

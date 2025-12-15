@@ -20,6 +20,7 @@ from .settings import (
 from .url_methods import (
     __return_json_v3,
     __return_json_v4,
+    __return_json_stable,
     __validate_industry,
     __validate_period,
     __validate_sector,
@@ -519,3 +520,112 @@ def sec_filings_data(symbol, filing_type='10-K', limit=1):
             finalcontent += f"\nNo direct link available for {filing_type} filing of {symbol}"
     
     return finalcontent or {"error": f"Failed to retrieve content for {symbol} {filing_type} filings"}
+
+
+def income_statement_ttm(
+    symbol: str,
+    output: str = 'markdown'
+) -> typing.Union[typing.List[typing.Dict], str]:
+    """
+    Retrieve trailing twelve months (TTM) income statement data for a company.
+
+    Provides the most recent 12-month aggregated income statement data,
+    useful for analyzing current profitability trends without waiting
+    for quarterly or annual reports.
+
+    :param symbol: Company ticker (e.g., 'AAPL').
+    :param output: Output format ('tsv', 'json', or 'markdown'). Defaults to 'markdown'.
+    :return: List of dicts or formatted string with TTM income statement data.
+    :example: income_statement_ttm('AAPL')
+    """
+    path = "income-statement-ttm"
+    query_vars = {"apikey": API_KEY, "symbol": symbol}
+    result = __return_json_stable(path=path, query_vars=query_vars)
+    return format_output(result, output)
+
+
+def balance_sheet_statement_ttm(
+    symbol: str,
+    output: str = 'markdown'
+) -> typing.Union[typing.List[typing.Dict], str]:
+    """
+    Retrieve trailing twelve months (TTM) balance sheet data for a company.
+
+    Provides the most recent balance sheet snapshot, useful for analyzing
+    current financial position including assets, liabilities, and equity.
+
+    :param symbol: Company ticker (e.g., 'AAPL').
+    :param output: Output format ('tsv', 'json', or 'markdown'). Defaults to 'markdown'.
+    :return: List of dicts or formatted string with TTM balance sheet data.
+    :example: balance_sheet_statement_ttm('AAPL')
+    """
+    path = "balance-sheet-statement-ttm"
+    query_vars = {"apikey": API_KEY, "symbol": symbol}
+    result = __return_json_stable(path=path, query_vars=query_vars)
+    return format_output(result, output)
+
+
+def cash_flow_statement_ttm(
+    symbol: str,
+    output: str = 'markdown'
+) -> typing.Union[typing.List[typing.Dict], str]:
+    """
+    Retrieve trailing twelve months (TTM) cash flow statement data for a company.
+
+    Provides the most recent 12-month aggregated cash flow data,
+    useful for analyzing current cash generation and usage patterns.
+
+    :param symbol: Company ticker (e.g., 'AAPL').
+    :param output: Output format ('tsv', 'json', or 'markdown'). Defaults to 'markdown'.
+    :return: List of dicts or formatted string with TTM cash flow statement data.
+    :example: cash_flow_statement_ttm('AAPL')
+    """
+    path = "cash-flow-statement-ttm"
+    query_vars = {"apikey": API_KEY, "symbol": symbol}
+    result = __return_json_stable(path=path, query_vars=query_vars)
+    return format_output(result, output)
+
+
+def latest_financial_statements(
+    page: int = 0,
+    limit: int = 250,
+    output: str = 'markdown'
+) -> typing.Union[typing.List[typing.Dict], str]:
+    """
+    Retrieve the latest financial statements filed by all companies.
+
+    Provides a paginated list of the most recently filed financial statements,
+    useful for monitoring new filings across the market or finding recently
+    updated company financials.
+
+    :param page: Page number for pagination (0-indexed). Default is 0.
+    :param limit: Number of records per page. Default is 250.
+    :param output: Output format ('tsv', 'json', or 'markdown'). Defaults to 'markdown'.
+    :return: List of dicts or formatted string with latest financial statement data.
+    :example: latest_financial_statements(page=0, limit=50)
+    """
+    path = "latest-financial-statements"
+    query_vars = {"apikey": API_KEY, "page": page, "limit": limit}
+    result = __return_json_stable(path=path, query_vars=query_vars)
+    return format_output(result, output)
+
+
+def earning_call_transcript_latest(
+    symbol: str,
+    output: str = 'markdown'
+) -> typing.Union[typing.List[typing.Dict], str]:
+    """
+    Retrieve the most recent earnings call transcript for a company.
+
+    Provides quick access to the latest earnings call without needing
+    to specify year and quarter parameters.
+
+    :param symbol: Company ticker (e.g., 'AAPL').
+    :param output: Output format ('tsv', 'json', or 'markdown'). Defaults to 'markdown'.
+    :return: List of dicts or formatted string with the latest earnings call transcript.
+    :example: earning_call_transcript_latest('AAPL')
+    """
+    path = "earning-call-transcript-latest"
+    query_vars = {"apikey": API_KEY, "symbol": symbol}
+    result = __return_json_stable(path=path, query_vars=query_vars)
+    return format_output(result, output)

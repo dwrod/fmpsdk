@@ -152,15 +152,36 @@ def clean_html_content(soup):
 
     return text
 
+def _escape_markdown_cell(value: str) -> str:
+    """
+    Escape special characters in markdown table cell content.
+
+    Handles pipe characters and newlines that would break table structure.
+
+    :param value: Raw cell value.
+    :return: Escaped value safe for markdown tables.
+    """
+    if not isinstance(value, str):
+        value = str(value)
+    # Escape pipe characters (would break table structure)
+    value = value.replace('|', '\\|')
+    # Replace newlines with space (would break table rows)
+    value = value.replace('\n', ' ').replace('\r', '')
+    return value
+
+
 def compress_json_to_markdown(json_data: List[Dict[str, Any]],
                               fields: Tuple[str, ...] = None) -> str:
     """
     Compress JSON data into markdown-formatted tables for efficient LLM consumption.
-    
+
+    Properly escapes pipe characters and newlines in cell values to prevent
+    malformed tables that could cause LLM parsing errors.
+
     Args:
     json_data (List[Dict[str, Any]]): List of dictionaries containing the data.
     fields (Tuple[str, ...]): Tuple of field names to include in the output. If None, all fields are included.
-    
+
     Returns:
     str: Markdown formatted string of the compressed data.
     """
@@ -170,14 +191,17 @@ def compress_json_to_markdown(json_data: List[Dict[str, Any]],
     # Use specified fields if provided, otherwise use all keys from the first dictionary
     fieldnames = fields if fields else list(json_data[0].keys())
 
+    # Escape field names for header (unlikely but defensive)
+    escaped_fieldnames = [_escape_markdown_cell(f) for f in fieldnames]
+
     # Create the header row
-    header = "| " + " | ".join(fieldnames) + " |"
+    header = "| " + " | ".join(escaped_fieldnames) + " |"
     separator = "| " + " | ".join(["---" for _ in fieldnames]) + " |"
 
-    # Create the data rows
+    # Create the data rows with escaped values
     rows = []
     for row in json_data:
-        row_data = [str(row.get(field, '')) for field in fieldnames]
+        row_data = [_escape_markdown_cell(str(row.get(field, ''))) for field in fieldnames]
         rows.append("| " + " | ".join(row_data) + " |")
 
     # Combine all parts of the markdown table

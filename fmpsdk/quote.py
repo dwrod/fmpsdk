@@ -1,6 +1,6 @@
 import typing
 import os
-from .url_methods import __return_json_v3, __validate_time_delta
+from .url_methods import __return_json_v3, __return_json_stable, __validate_time_delta
 from .settings import DEFAULT_LIMIT, DEFAULT_LINE_PARAMETER
 from .data_compression import format_output
 
@@ -313,4 +313,47 @@ def forex_historical(
     query_vars = {"apikey": API_KEY, "from": from_date, "to": to_date}
     result = __return_json_v3(path=path, query_vars=query_vars)
     result = result.get("historical", None)
+    return format_output(result, output)
+
+
+def aftermarket_trade(
+    symbol: str,
+    output: str = 'markdown'
+) -> typing.Union[typing.List[typing.Dict], str]:
+    """
+    Retrieve after-hours trading data for a stock.
+
+    Provides real-time after-hours trade data including price, volume,
+    and timestamp. Useful for monitoring price movements outside regular
+    market hours.
+
+    :param symbol: Company ticker (e.g., 'AAPL').
+    :param output: Output format ('tsv', 'json', or 'markdown'). Defaults to 'markdown'.
+    :return: After-hours trade data in the specified format.
+    :example: aftermarket_trade('AAPL')
+    """
+    path = "aftermarket-trade"
+    query_vars = {"apikey": API_KEY, "symbol": symbol}
+    result = __return_json_stable(path=path, query_vars=query_vars)
+    return format_output(result, output)
+
+
+def aftermarket_quote(
+    symbol: str,
+    output: str = 'markdown'
+) -> typing.Union[typing.List[typing.Dict], str]:
+    """
+    Retrieve after-hours quote data for a stock.
+
+    Provides real-time after-hours bid/ask prices and related quote data.
+    Useful for understanding after-hours market sentiment and pricing.
+
+    :param symbol: Company ticker (e.g., 'AAPL').
+    :param output: Output format ('tsv', 'json', or 'markdown'). Defaults to 'markdown'.
+    :return: After-hours quote data in the specified format.
+    :example: aftermarket_quote('AAPL')
+    """
+    path = "aftermarket-quote"
+    query_vars = {"apikey": API_KEY, "symbol": symbol}
+    result = __return_json_stable(path=path, query_vars=query_vars)
     return format_output(result, output)

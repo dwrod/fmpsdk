@@ -17,8 +17,8 @@ This is a **forked and customized** Python SDK for the [Financial Modeling Prep 
 fmpsdk/
 ├── __init__.py          # Root package (re-exports fmpsdk/)
 ├── fmpsdk/              # Main SDK package
-│   ├── __init__.py      # Exports 159 public functions
-│   ├── url_methods.py   # Core HTTP methods (__return_json_v3, __return_json_v4)
+│   ├── __init__.py      # Exports 178 public functions
+│   ├── url_methods.py   # Core HTTP methods (__return_json_v3, __return_json_v4, __return_json_stable)
 │   ├── settings.py      # Constants (BASE_URLs, valid values, filenames)
 │   ├── data_compression.py  # Output formatting (TSV, Markdown, JSON)
 │   │
@@ -98,16 +98,45 @@ fmpsdk.income_statement('AAPL', output='tsv')
 
 - **v3 API** (`__return_json_v3`): Most endpoints - financial statements, quotes, company data
 - **v4 API** (`__return_json_v4`): Newer endpoints - batch transcripts, core info, outlook
+- **Stable API** (`__return_json_stable`): Latest endpoints - TTM statements, aftermarket data, ratings snapshots
 
 ### Error Handling
 
-Functions return `None` on API errors (logged to console). Check return values:
+**API Responses:**
+Functions return `None` on API errors with detailed logging. Check return values:
 
 ```python
 result = fmpsdk.company_profile('AAPL')
 if result is None:
-    # Handle error - check logs for details
+    # Handle error - check logs for detailed error messages
+    # Logs include HTTP status codes (401, 403, 404, 429, 5xx)
 ```
+
+**Validation Errors:**
+Parameter validation functions raise `ValueError` for invalid inputs:
+
+```python
+try:
+    fmpsdk.historical_chart('AAPL', timeframe='invalid', ...)
+except ValueError as e:
+    # e.g., "Invalid time_delta value: 'invalid'. Valid options: ['1min', '5min', ...]"
+    pass
+```
+
+**Custom Exception:**
+The `FMPAPIError` exception class is available for structured error handling:
+
+```python
+from fmpsdk import FMPAPIError
+# Can be raised for API-specific errors with status_code and url attributes
+```
+
+**HTTP Status Code Handling:**
+- `401`: Authentication failed - check FMP_API_KEY
+- `403`: Access forbidden - endpoint may not be in your plan
+- `404`: Resource not found - symbol or endpoint doesn't exist
+- `429`: Rate limit exceeded - reduce request frequency
+- `5xx`: Server error - retry later
 
 ## Key Functions for Case Studies
 
@@ -233,8 +262,9 @@ Local code review is configured via `.claude/` directory:
 ## FMP API Reference
 
 - Full API docs: https://site.financialmodelingprep.com/developer/docs
-- 159+ endpoints currently implemented
-- ~150+ additional endpoints available in FMP API not yet in SDK
+- 170 endpoints currently implemented in the registry
+- 178 public functions exported (including registry utilities)
+- ~140+ additional endpoints available in FMP API not yet in SDK
 
 ## Git Submodule Note
 

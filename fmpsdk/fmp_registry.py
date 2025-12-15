@@ -2586,6 +2586,186 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         example_use_cases=["TSX market data"],
         returns="TSX stocks data.",
     ),
+    # =========================================================================
+    # NEW STABLE API ENDPOINTS
+    # =========================================================================
+    "income_statement_ttm": FMPEndpoint(
+        name="income_statement_ttm",
+        function="income_statement_ttm",
+        description="Trailing twelve months (TTM) income statement data. Aggregates the most recent 12 months of data regardless of fiscal year.",
+        category="financials",
+        parameters={
+            "symbol": {"type": "str", "required": True, "description": "Stock ticker (e.g., 'AAPL')"},
+            "output": {"type": "str", "required": False, "default": "markdown", "options": ["markdown", "json", "tsv"]},
+        },
+        example_use_cases=[
+            "Current profitability analysis without waiting for quarterly reports",
+            "Rolling 12-month revenue trend analysis",
+            "Most recent financial performance snapshot",
+        ],
+        returns="TTM income statement with revenue, expenses, netIncome, etc.",
+    ),
+    "balance_sheet_statement_ttm": FMPEndpoint(
+        name="balance_sheet_statement_ttm",
+        function="balance_sheet_statement_ttm",
+        description="Most recent balance sheet snapshot showing current financial position.",
+        category="financials",
+        parameters={
+            "symbol": {"type": "str", "required": True, "description": "Stock ticker (e.g., 'AAPL')"},
+            "output": {"type": "str", "required": False, "default": "markdown", "options": ["markdown", "json", "tsv"]},
+        },
+        example_use_cases=[
+            "Current asset and liability analysis",
+            "Latest equity position assessment",
+            "Real-time financial health check",
+        ],
+        returns="Current balance sheet with totalAssets, totalLiabilities, totalEquity, etc.",
+    ),
+    "cash_flow_statement_ttm": FMPEndpoint(
+        name="cash_flow_statement_ttm",
+        function="cash_flow_statement_ttm",
+        description="Trailing twelve months (TTM) cash flow statement. Shows rolling 12-month cash generation and usage.",
+        category="financials",
+        parameters={
+            "symbol": {"type": "str", "required": True, "description": "Stock ticker (e.g., 'AAPL')"},
+            "output": {"type": "str", "required": False, "default": "markdown", "options": ["markdown", "json", "tsv"]},
+        },
+        example_use_cases=[
+            "Current free cash flow analysis",
+            "Rolling cash generation trends",
+            "Capital expenditure assessment",
+        ],
+        returns="TTM cash flow statement with operatingCashFlow, investingCashFlow, financingCashFlow, etc.",
+    ),
+    "latest_financial_statements": FMPEndpoint(
+        name="latest_financial_statements",
+        function="latest_financial_statements",
+        description="Paginated list of the most recently filed financial statements across all companies. Useful for monitoring new filings.",
+        category="financials",
+        parameters={
+            "page": {"type": "int", "required": False, "default": 0, "description": "Page number (0-indexed)"},
+            "limit": {"type": "int", "required": False, "default": 250, "description": "Results per page"},
+            "output": {"type": "str", "required": False, "default": "markdown", "options": ["markdown", "json", "tsv"]},
+        },
+        example_use_cases=[
+            "Monitor new SEC filings across the market",
+            "Track recently updated financials",
+            "Find companies with fresh financial data",
+        ],
+        returns="List of recently filed financial statements with company info and filing dates.",
+    ),
+    "earning_call_transcript_latest": FMPEndpoint(
+        name="earning_call_transcript_latest",
+        function="earning_call_transcript_latest",
+        description="Most recent earnings call transcript for a company. Quick access without specifying year/quarter.",
+        category="earnings",
+        parameters={
+            "symbol": {"type": "str", "required": True, "description": "Stock ticker (e.g., 'AAPL')"},
+            "output": {"type": "str", "required": False, "default": "markdown", "options": ["markdown", "json", "tsv"]},
+        },
+        example_use_cases=[
+            "Quick access to latest management commentary",
+            "Recent earnings call analysis",
+            "Current quarter executive discussions",
+        ],
+        returns="Latest earnings call transcript with content and metadata.",
+        notes="Transcripts can be very long (10k+ words). Consider token limits when processing.",
+    ),
+    "ratings_snapshot": FMPEndpoint(
+        name="ratings_snapshot",
+        function="ratings_snapshot",
+        description="Snapshot of analyst ratings showing buy/hold/sell recommendations distribution.",
+        category="analysts",
+        parameters={
+            "symbol": {"type": "str", "required": True, "description": "Stock ticker (e.g., 'AAPL')"},
+            "output": {"type": "str", "required": False, "default": "markdown", "options": ["markdown", "json", "tsv"]},
+        },
+        example_use_cases=[
+            "Quick analyst sentiment overview",
+            "Buy/sell recommendation counts",
+            "Market consensus assessment",
+        ],
+        returns="Rating distribution with strong buy, buy, hold, sell, strong sell counts.",
+    ),
+    "grades_consensus": FMPEndpoint(
+        name="grades_consensus",
+        function="grades_consensus",
+        description="Consensus grade from analyst ratings aggregated into a single recommendation.",
+        category="analysts",
+        parameters={
+            "symbol": {"type": "str", "required": True, "description": "Stock ticker (e.g., 'AAPL')"},
+            "output": {"type": "str", "required": False, "default": "markdown", "options": ["markdown", "json", "tsv"]},
+        },
+        example_use_cases=[
+            "Overall analyst consensus rating",
+            "Aggregated market opinion",
+            "Quick recommendation lookup",
+        ],
+        returns="Consensus grade with overall recommendation and scores.",
+    ),
+    "aftermarket_trade": FMPEndpoint(
+        name="aftermarket_trade",
+        function="aftermarket_trade",
+        description="After-hours trading data including price, volume, and timestamp. Shows extended hours activity.",
+        category="market",
+        parameters={
+            "symbol": {"type": "str", "required": True, "description": "Stock ticker (e.g., 'AAPL')"},
+            "output": {"type": "str", "required": False, "default": "markdown", "options": ["markdown", "json", "tsv"]},
+        },
+        example_use_cases=[
+            "Monitor after-hours price movements",
+            "Track extended hours volume",
+            "Assess overnight market reactions",
+        ],
+        returns="After-hours trade data with price, volume, timestamp.",
+    ),
+    "aftermarket_quote": FMPEndpoint(
+        name="aftermarket_quote",
+        function="aftermarket_quote",
+        description="After-hours quote data including bid/ask prices. Shows extended hours pricing.",
+        category="market",
+        parameters={
+            "symbol": {"type": "str", "required": True, "description": "Stock ticker (e.g., 'AAPL')"},
+            "output": {"type": "str", "required": False, "default": "markdown", "options": ["markdown", "json", "tsv"]},
+        },
+        example_use_cases=[
+            "After-hours bid/ask spread analysis",
+            "Extended hours market sentiment",
+            "Pre-market pricing assessment",
+        ],
+        returns="After-hours quote with bid, ask, and related pricing data.",
+    ),
+    "industry_performance_snapshot": FMPEndpoint(
+        name="industry_performance_snapshot",
+        function="industry_performance_snapshot",
+        description="Current performance metrics for all market industries. Shows which industries are outperforming or underperforming.",
+        category="market",
+        parameters={
+            "output": {"type": "str", "required": False, "default": "markdown", "options": ["markdown", "json", "tsv"]},
+        },
+        example_use_cases=[
+            "Industry sector comparison",
+            "Identify outperforming sectors",
+            "Market rotation analysis",
+        ],
+        returns="Performance data for each industry with change percentages.",
+    ),
+    "holidays_by_exchange": FMPEndpoint(
+        name="holidays_by_exchange",
+        function="holidays_by_exchange",
+        description="Market holidays for a specific exchange. Shows when markets are closed.",
+        category="market",
+        parameters={
+            "exchange": {"type": "str", "required": True, "description": "Exchange name (e.g., 'NASDAQ', 'NYSE')"},
+            "output": {"type": "str", "required": False, "default": "markdown", "options": ["markdown", "json", "tsv"]},
+        },
+        example_use_cases=[
+            "Trading calendar planning",
+            "Market closure schedule",
+            "Holiday schedule lookup",
+        ],
+        returns="List of holiday dates with names for the exchange.",
+    ),
 }
 
 
@@ -2632,22 +2812,28 @@ CATEGORIES = {
 
 
 def get_endpoints_by_category(category: str) -> List[FMPEndpoint]:
-    """Get all endpoints in a specific category.
+    """
+    Get all endpoints in a specific category.
 
-    Args:
-        category: Category name (e.g., 'financials', 'sec', 'news')
+    Retrieves all FMP endpoint definitions that belong to the specified category,
+    useful for filtering endpoints by functional area.
 
-    Returns:
-        List of FMPEndpoint objects in the category
+    :param category: Category name (e.g., 'financials', 'sec', 'news', 'market').
+    :return: List of FMPEndpoint objects matching the category.
+    :example: get_endpoints_by_category('financials')
     """
     return [ep for ep in FMP_REGISTRY.values() if ep.category == category]
 
 
 def get_all_categories() -> List[str]:
-    """Get all available categories.
+    """
+    Get all available endpoint categories.
 
-    Returns:
-        List of category names
+    Returns the list of category names used to organize FMP endpoints.
+    Categories include: financials, earnings, sec, company, metrics, etc.
+
+    :return: List of category name strings.
+    :example: get_all_categories()
     """
     return list(CATEGORIES.keys())
 
@@ -2657,18 +2843,19 @@ def get_registry_for_llm(
     include_parameters: bool = True,
     include_use_cases: bool = True,
 ) -> str:
-    """Format registry as context for LLM schema generation.
+    """
+    Format registry as context for LLM schema generation.
 
-    Groups endpoints by category with descriptions and use cases.
-    Designed to be token-efficient while providing comprehensive information.
+    Groups endpoints by category with descriptions, parameters, and use cases.
+    Designed to be token-efficient while providing comprehensive information
+    for LLM-powered data source selection.
 
-    Args:
-        categories: Optional list of categories to include. If None, includes all.
-        include_parameters: Whether to include parameter details
-        include_use_cases: Whether to include example use cases
-
-    Returns:
-        Formatted string suitable for LLM context
+    :param categories: Optional list of categories to include. If None, includes all.
+    :param include_parameters: Whether to include parameter details. Default True.
+    :param include_use_cases: Whether to include example use cases. Default True.
+    :return: Markdown-formatted string suitable for LLM context.
+    :example: get_registry_for_llm(categories=['financials', 'earnings'])
+    :example: get_registry_for_llm(include_parameters=False)
     """
     lines = ["# AVAILABLE FMP DATA SOURCES", ""]
 
@@ -2728,10 +2915,15 @@ def get_registry_for_llm(
 
 
 def get_compact_registry_for_llm() -> str:
-    """Get a compact version of the registry for token-limited contexts.
+    """
+    Get a compact version of the registry for token-limited contexts.
 
-    Returns:
-        Compact formatted string
+    Returns a condensed view of all endpoints with truncated descriptions,
+    ideal for contexts with limited token budgets while still providing
+    endpoint discovery capabilities.
+
+    :return: Compact markdown-formatted string with abbreviated endpoint info.
+    :example: get_compact_registry_for_llm()
     """
     lines = ["# FMP DATA SOURCES (Compact)", ""]
 
@@ -2750,13 +2942,17 @@ def get_compact_registry_for_llm() -> str:
 
 
 def search_endpoints(query: str) -> List[FMPEndpoint]:
-    """Search endpoints by keyword.
+    """
+    Search endpoints by keyword.
 
-    Args:
-        query: Search query
+    Performs case-insensitive search across endpoint names, descriptions,
+    categories, and use cases. Useful for finding relevant endpoints
+    based on natural language queries.
 
-    Returns:
-        List of matching FMPEndpoint objects
+    :param query: Search query string (e.g., 'income', 'earnings call', 'insider').
+    :return: List of FMPEndpoint objects matching the search query.
+    :example: search_endpoints('income statement')
+    :example: search_endpoints('analyst')
     """
     query_lower = query.lower()
     results = []

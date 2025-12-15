@@ -1,7 +1,7 @@
 import typing
 import os
 from .settings import DEFAULT_LIMIT
-from .url_methods import __return_json_v3, __return_json_v4
+from .url_methods import __return_json_v3, __return_json_v4, __return_json_stable
 from datetime import date
 from .data_compression import format_output
 
@@ -213,8 +213,8 @@ def multiple_company_prices(
     result = __return_json_v3(path=path, query_vars=query_vars)
     return format_output(result, output)
 
-def historical_sectors_performance(from_date: str, 
-                                   to_date: str, 
+def historical_sectors_performance(from_date: str,
+                                   to_date: str,
                                    output: str = 'markdown') -> typing.Union[typing.List[typing.Dict], str]:
     """
     Retrieve historical performance data for stock market sectors.
@@ -237,4 +237,45 @@ def historical_sectors_performance(from_date: str,
         "to": to_date
     }
     result = __return_json_v3(path=path, query_vars=query_vars)
+    return format_output(result, output)
+
+
+def industry_performance_snapshot(
+    output: str = 'markdown'
+) -> typing.Union[typing.List[typing.Dict], str]:
+    """
+    Retrieve a snapshot of performance for all market industries.
+
+    Provides current performance metrics for each industry sector,
+    including change percentages and other key indicators. Useful for
+    identifying outperforming or underperforming industries.
+
+    :param output: Output format ('tsv', 'json', or 'markdown'). Defaults to 'markdown'.
+    :return: List of dicts or formatted string with industry performance data.
+    :example: industry_performance_snapshot()
+    """
+    path = "industry-performance-snapshot"
+    query_vars = {"apikey": API_KEY}
+    result = __return_json_stable(path=path, query_vars=query_vars)
+    return format_output(result, output)
+
+
+def holidays_by_exchange(
+    exchange: str,
+    output: str = 'markdown'
+) -> typing.Union[typing.List[typing.Dict], str]:
+    """
+    Retrieve market holidays for a specific exchange.
+
+    Provides a list of dates when the exchange is closed for holidays,
+    useful for planning trading activities and understanding market schedules.
+
+    :param exchange: Exchange name (e.g., 'NASDAQ', 'NYSE').
+    :param output: Output format ('tsv', 'json', or 'markdown'). Defaults to 'markdown'.
+    :return: List of dicts or formatted string with holiday dates and names.
+    :example: holidays_by_exchange('NASDAQ')
+    """
+    path = "holidays-by-exchange"
+    query_vars = {"apikey": API_KEY, "exchange": exchange}
+    result = __return_json_stable(path=path, query_vars=query_vars)
     return format_output(result, output)

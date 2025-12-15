@@ -1288,6 +1288,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "timeframe": {"type": "str", "required": True, "options": ["1min", "5min", "15min", "30min", "1hour", "4hour", "1day"]},
             "from_date": {"type": "str", "required": True, "description": "YYYY-MM-DD"},
             "to_date": {"type": "str", "required": True, "description": "YYYY-MM-DD"},
+            "time_series": {"type": "str", "required": False, "default": "line", "description": "Time series parameter"},
             "output": {"type": "str", "required": False, "default": "markdown"},
         },
         example_use_cases=[
@@ -1837,13 +1838,13 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
     "technical_indicators": FMPEndpoint(
         name="technical_indicators",
         function="technical_indicators",
-        description="Technical indicators (SMA, EMA, RSI, MACD, etc.).",
+        description="Technical indicators (SMA, EMA, WMA, DEMA, TEMA, RSI, ADX, Williams %R, Standard Deviation).",
         category="technical",
         parameters={
             "symbol": {"type": "str", "required": True},
             "period": {"type": "int", "required": False, "default": 10},
             "statistics_type": {"type": "str", "required": False, "default": "sma", "options": ["sma", "ema", "wma", "dema", "tema", "williams", "rsi", "adx", "standardDeviation"]},
-            "time_delta": {"type": "str", "required": False, "default": "1day", "options": ["1min", "5min", "15min", "30min", "1hour", "4hour", "1day"]},
+            "time_delta": {"type": "str", "required": False, "default": "1day", "options": ["1min", "5min", "15min", "30min", "1hour", "4hour", "1day", "1week", "1month", "1year"]},
             "output": {"type": "str", "required": False, "default": "markdown"},
         },
         example_use_cases=[

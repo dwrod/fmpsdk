@@ -203,6 +203,17 @@ from .valuation_metrics import (
     historical_market_capitalization,
 )
 
+from .fmp_registry import (
+    FMPEndpoint,
+    FMP_REGISTRY,
+    CATEGORIES,
+    get_endpoints_by_category,
+    get_all_categories,
+    get_registry_for_llm,
+    get_compact_registry_for_llm,
+    search_endpoints,
+)
+
 attribution: str = "Data provided by Financial Modeling Prep"
 logging.info(attribution)
 
@@ -366,4 +377,13 @@ __all__ = [
     "upgrades_downgrades_by_company",
     "upgrades_downgrades_consensus",
     "upgrades_downgrades_rss_feed",
+    # Registry exports
+    "FMPEndpoint",
+    "FMP_REGISTRY",
+    "CATEGORIES",
+    "get_endpoints_by_category",
+    "get_all_categories",
+    "get_registry_for_llm",
+    "get_compact_registry_for_llm",
+    "search_endpoints",
 ]

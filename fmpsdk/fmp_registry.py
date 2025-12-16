@@ -21,13 +21,15 @@ from typing import Any, Dict, List, Optional
 
 @dataclass
 class FMPEndpoint:
-    """Registry entry for an FMP endpoint."""
+    """Registry entry for an FMP endpoint.
+
+    GEN-92: Parameters are now extracted from function signatures at runtime.
+    """
 
     name: str  # Canonical name (e.g., "income_statement")
     function: str  # fmpsdk function name
     description: str  # LLM-friendly description
     category: str  # Category for grouping
-    parameters: Dict[str, Any]  # Available params with types and defaults
     example_use_cases: List[str]  # When to use this endpoint
     returns: str  # Description of return data structure
     notes: Optional[str] = None  # Any caveats or special handling
@@ -46,12 +48,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="income_statement",
         description="Annual or quarterly income statement data including revenue, expenses, and net income. Shows profitability trends over time.",
         category="financials",
-        parameters={
-            "symbol": {"type": "str", "required": True, "description": "Stock ticker (e.g., 'AAPL')"},
-            "period": {"type": "str", "required": False, "default": "annual", "options": ["annual", "quarter"]},
-            "limit": {"type": "int", "required": False, "default": 10, "description": "Number of periods to retrieve"},
-            "output": {"type": "str", "required": False, "default": "markdown", "options": ["markdown", "json", "tsv"]},
-        },
         example_use_cases=[
             "Revenue trend analysis over multiple years",
             "Profitability assessment and margin analysis",
@@ -65,12 +61,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="balance_sheet_statement",
         description="Annual or quarterly balance sheet data including assets, liabilities, and equity. Shows financial position at specific points in time.",
         category="financials",
-        parameters={
-            "symbol": {"type": "str", "required": True, "description": "Stock ticker or CIK"},
-            "period": {"type": "str", "required": False, "default": "annual", "options": ["annual", "quarter"]},
-            "limit": {"type": "int", "required": False, "default": 10},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Asset composition analysis",
             "Debt level assessment",
@@ -84,12 +74,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="cash_flow_statement",
         description="Annual or quarterly cash flow statement showing operating, investing, and financing activities. Reveals actual cash generation and usage.",
         category="financials",
-        parameters={
-            "symbol": {"type": "str", "required": True, "description": "Stock ticker or CIK"},
-            "period": {"type": "str", "required": False, "default": "annual", "options": ["annual", "quarter"]},
-            "limit": {"type": "int", "required": False, "default": 10},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Free cash flow analysis",
             "Capital expenditure trends",
@@ -103,12 +87,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="income_statement_as_reported",
         description="Income statement exactly as reported in SEC filings, without standardization. Useful for detailed analysis matching company-specific terminology.",
         category="financials",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "period": {"type": "str", "required": False, "default": "annual"},
-            "limit": {"type": "int", "required": False, "default": 10},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Detailed SEC filing analysis",
             "Company-specific line item research",
@@ -121,12 +99,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="balance_sheet_statement_as_reported",
         description="Balance sheet exactly as reported in SEC filings, without standardization.",
         category="financials",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "period": {"type": "str", "required": False, "default": "annual"},
-            "limit": {"type": "int", "required": False, "default": 10},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Detailed SEC filing analysis",
             "Company-specific asset/liability categorization",
@@ -138,12 +110,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="cash_flow_statement_as_reported",
         description="Cash flow statement exactly as reported in SEC filings, without standardization.",
         category="financials",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "period": {"type": "str", "required": False, "default": "annual"},
-            "limit": {"type": "int", "required": False, "default": 10},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Detailed SEC filing analysis",
             "Company-specific cash flow categorization",
@@ -155,11 +121,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="financial_statement_full_as_reported",
         description="Complete financial statements as reported in SEC filings, combining income, balance sheet, and cash flow.",
         category="financials",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "period": {"type": "str", "required": False, "default": "annual"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Comprehensive SEC filing analysis",
             "Full financial picture from original filings",
@@ -171,10 +132,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="earnings_surprises",
         description="Historical earnings surprises showing actual vs estimated EPS. Reveals how often a company beats or misses expectations.",
         category="financials",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Earnings beat/miss pattern analysis",
             "Management guidance accuracy assessment",
@@ -190,12 +147,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="earning_call_transcript",
         description="Full text transcript of earnings call for a specific quarter. Contains management commentary, guidance, and Q&A with analysts.",
         category="earnings",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "year": {"type": "int", "required": True, "description": "Year (e.g., 2024)"},
-            "quarter": {"type": "int", "required": True, "description": "Quarter (1-4)"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Management sentiment analysis",
             "Strategic initiative tracking",
@@ -210,11 +161,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="batch_earning_call_transcript",
         description="All earnings call transcripts for a company in a given year. Efficient for annual analysis.",
         category="earnings",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "year": {"type": "int", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Full year management commentary analysis",
             "Quarterly guidance evolution tracking",
@@ -228,9 +174,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="earning_call_transcripts_available_dates",
         description="List of available earnings call transcript dates for a company. Use to discover which transcripts are available.",
         category="earnings",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-        },
         example_use_cases=[
             "Discover available transcript dates before fetching",
             "Plan transcript analysis scope",
@@ -245,11 +188,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="sec_filings",
         description="SEC filing metadata and links (10-K, 10-Q, 8-K, etc.). Returns filing dates, types, and URLs but NOT the actual content.",
         category="sec",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "filing_type": {"type": "str", "required": False, "default": "", "options": ["10-K", "10-Q", "8-K", "DEF 14A", "S-1", "etc"]},
-            "limit": {"type": "int", "required": False, "default": 10},
-        },
         example_use_cases=[
             "Find SEC filing links for further analysis",
             "Track filing history and timing",
@@ -262,11 +200,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="sec_filings_data",
         description="Full text content of SEC filings rendered as Markdown. Fetches and parses actual filing content from SEC EDGAR.",
         category="sec",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "filing_type": {"type": "str", "required": False, "default": "10-K", "options": ["10-K", "10-Q", "8-K"]},
-            "limit": {"type": "int", "required": False, "default": 1},
-        },
         example_use_cases=[
             "Deep 10-K analysis for risk factors, business description",
             "8-K event analysis for material events",
@@ -283,10 +216,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="company_profile",
         description="Comprehensive company overview including price, market cap, sector, industry, CEO, description, headquarters, website, and key statistics.",
         category="company",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Company overview and background research",
             "Sector and industry classification",
@@ -300,10 +229,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="key_executives",
         description="Key executives data from SEC filings including names, titles, and compensation.",
         category="company",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Management team analysis",
             "Executive compensation research",
@@ -316,10 +241,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="company_core_information",
         description="Core company information including CIK, exchange, SIC code, and state of incorporation.",
         category="company",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Regulatory and compliance research",
             "Company registration details",
@@ -331,10 +252,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="company_outlook",
         description="Comprehensive company outlook combining profile, metrics, ratios, and stock data in one call.",
         category="company",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Quick comprehensive company snapshot",
             "All-in-one company analysis",
@@ -346,12 +263,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="enterprise_values",
         description="Enterprise value data including market cap, debt, and cash. Shows total company value for M&A analysis.",
         category="company",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "period": {"type": "str", "required": False, "default": "annual"},
-            "limit": {"type": "int", "required": False, "default": 10},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "M&A valuation analysis",
             "EV/EBITDA calculations",
@@ -367,13 +278,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="key_metrics",
         description="Key financial metrics including revenue per share, PE ratio, debt to equity, ROE, and more.",
         category="metrics",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "period": {"type": "str", "required": False, "default": "annual"},
-            "limit": {"type": "int", "required": False, "default": 10},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-            "precision": {"type": "int", "required": False, "default": 5},
-        },
         example_use_cases=[
             "Valuation metrics analysis",
             "Profitability metrics tracking",
@@ -386,12 +290,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="key_metrics_ttm",
         description="Trailing twelve months (TTM) key metrics for most recent performance snapshot.",
         category="metrics",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "limit": {"type": "int", "required": False, "default": 10},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-            "precision": {"type": "int", "required": False, "default": 5},
-        },
         example_use_cases=[
             "Current valuation metrics",
             "Real-time performance snapshot",
@@ -403,13 +301,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="financial_ratios",
         description="Comprehensive financial ratios including liquidity, profitability, debt, and efficiency ratios.",
         category="metrics",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "period": {"type": "str", "required": False, "default": "annual"},
-            "limit": {"type": "int", "required": False, "default": 10},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-            "precision": {"type": "int", "required": False, "default": 5},
-        },
         example_use_cases=[
             "Comprehensive ratio analysis",
             "Peer comparison",
@@ -423,11 +314,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="financial_ratios_ttm",
         description="Trailing twelve months financial ratios for current performance.",
         category="metrics",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-            "precision": {"type": "int", "required": False, "default": 5},
-        },
         example_use_cases=[
             "Current ratio analysis",
             "Real-time performance assessment",
@@ -442,13 +328,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="financial_growth",
         description="Financial growth metrics showing year-over-year or quarter-over-quarter growth rates.",
         category="growth",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "period": {"type": "str", "required": False, "default": "annual"},
-            "limit": {"type": "int", "required": False, "default": 10},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-            "precision": {"type": "int", "required": False, "default": 5},
-        },
         example_use_cases=[
             "Growth trend analysis",
             "Historical growth rate tracking",
@@ -461,12 +340,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="income_statement_growth",
         description="Income statement growth metrics showing revenue and profit growth trends.",
         category="growth",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "limit": {"type": "int", "required": False, "default": 10},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-            "precision": {"type": "int", "required": False, "default": 5},
-        },
         example_use_cases=[
             "Revenue growth analysis",
             "Profit margin trend analysis",
@@ -478,12 +351,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="balance_sheet_statement_growth",
         description="Balance sheet growth metrics showing asset and liability growth trends.",
         category="growth",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "limit": {"type": "int", "required": False, "default": 10},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-            "precision": {"type": "int", "required": False, "default": 5},
-        },
         example_use_cases=[
             "Asset growth analysis",
             "Debt growth tracking",
@@ -495,12 +362,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="cash_flow_statement_growth",
         description="Cash flow growth metrics showing operating, investing, and financing cash flow trends.",
         category="growth",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "limit": {"type": "int", "required": False, "default": 10},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-            "precision": {"type": "int", "required": False, "default": 5},
-        },
         example_use_cases=[
             "Cash flow growth analysis",
             "Free cash flow trend tracking",
@@ -515,10 +376,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="discounted_cash_flow",
         description="DCF valuation estimating intrinsic value based on projected future cash flows.",
         category="valuation",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Intrinsic value estimation",
             "Under/overvaluation assessment",
@@ -531,10 +388,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="advanced_discounted_cash_flow",
         description="Advanced DCF model with detailed assumptions and projections.",
         category="valuation",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Detailed intrinsic value analysis",
             "DCF sensitivity analysis",
@@ -546,11 +399,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="historical_daily_discounted_cash_flow",
         description="Daily historical DCF values showing intrinsic value evolution over time.",
         category="valuation",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "limit": {"type": "int", "required": False, "default": 10},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Historical valuation trends",
             "Valuation gap analysis over time",
@@ -562,10 +410,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="market_capitalization",
         description="Current market capitalization of a company.",
         category="valuation",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Company size classification",
             "Market value assessment",
@@ -577,11 +421,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="historical_market_capitalization",
         description="Historical market capitalization showing company value over time.",
         category="valuation",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "limit": {"type": "int", "required": False, "default": 10},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Market cap growth analysis",
             "Historical size tracking",
@@ -596,10 +435,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="rating",
         description="FMP's proprietary rating based on financial analysis including DCF, ratios, and intrinsic value.",
         category="analysts",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Quick investment rating lookup",
             "Automated screening based on ratings",
@@ -611,11 +446,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="historical_rating",
         description="Historical ratings showing how FMP's assessment has changed over time.",
         category="analysts",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "limit": {"type": "int", "required": False, "default": 100},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Rating trend analysis",
             "Historical sentiment tracking",
@@ -627,12 +457,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="analyst_estimates",
         description="Wall Street analyst estimates for future earnings, revenue, and EPS.",
         category="analysts",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "period": {"type": "str", "required": False, "default": "annual"},
-            "limit": {"type": "int", "required": False, "default": 100},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Forward earnings expectations",
             "Revenue forecast analysis",
@@ -646,10 +470,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="analyst_recommendation",
         description="Analyst buy/sell/hold recommendations with analyst firm details.",
         category="analysts",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Analyst sentiment analysis",
             "Recommendation consensus tracking",
@@ -662,11 +482,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="stock_grade",
         description="Stock grades from hedge funds, investment firms, and analysts.",
         category="analysts",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "limit": {"type": "int", "required": False, "default": 50},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Professional investor assessment",
             "Grade change tracking",
@@ -678,10 +493,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="upgrades_downgrades",
         description="Stock upgrades and downgrades from analysts.",
         category="analysts",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Rating change tracking",
             "Analyst sentiment shifts",
@@ -693,10 +504,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="upgrades_downgrades_consensus",
         description="Consensus rating across all analysts for a stock.",
         category="analysts",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Overall analyst sentiment",
             "Consensus view assessment",
@@ -708,10 +515,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="upgrades_downgrades_by_company",
         description="All upgrades and downgrades issued by a specific analyst firm.",
         category="analysts",
-        parameters={
-            "company": {"type": "str", "required": True, "description": "Analyst firm name (e.g., 'Morgan Stanley')"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Track specific analyst firm recommendations",
             "Firm-level research aggregation",
@@ -726,10 +529,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="price_targets",
         description="Analyst price targets for a company's stock.",
         category="price_targets",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Price target analysis",
             "Upside/downside potential assessment",
@@ -741,10 +540,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="price_target_summary",
         description="Summary of price targets including average, high, low, and number of analysts.",
         category="price_targets",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Quick price target overview",
             "Analyst consensus target",
@@ -756,10 +551,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="price_target_consensus",
         description="Consensus price target averaging all analyst targets.",
         category="price_targets",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Consensus price expectation",
             "Overall market target",
@@ -771,10 +562,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="price_target_by_analyst_name",
         description="Price targets from a specific analyst across different stocks.",
         category="price_targets",
-        parameters={
-            "name": {"type": "str", "required": True, "description": "Analyst name"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Track specific analyst coverage",
             "Analyst performance tracking",
@@ -786,10 +573,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="price_target_by_company",
         description="Price targets from a specific analyst firm.",
         category="price_targets",
-        parameters={
-            "company": {"type": "str", "required": True, "description": "Analyst firm (e.g., 'Barclays')"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Firm-level price targets",
             "Institutional research tracking",
@@ -801,10 +584,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="price_target_rss_feed",
         description="RSS feed of latest price target updates across all stocks.",
         category="price_targets",
-        parameters={
-            "page": {"type": "int", "required": False, "default": 0},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Real-time price target monitoring",
             "Latest analyst actions",
@@ -819,10 +598,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="esg_score",
         description="Environmental, Social, and Governance (ESG) scores with breakdown by E, S, and G components.",
         category="esg",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Sustainability analysis",
             "ESG screening",
@@ -839,10 +614,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="stock_peers",
         description="Similar companies trading on the same exchange, in the same sector, with similar market cap.",
         category="company",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Competitor identification",
             "Peer comparison analysis",
@@ -855,10 +626,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="financial_score",
         description="Financial health score assessing company performance.",
         category="metrics",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Financial health assessment",
             "Quick screening metric",
@@ -870,10 +637,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="owner_earnings",
         description="Owner earnings calculation (Buffett's preferred metric) showing true cash available to shareholders.",
         category="metrics",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Value investing analysis",
             "True earnings power assessment",
@@ -888,12 +651,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="sales_revenue_by_segments",
         description="Segment revenue: revenue breakdown by business segments, product lines, services. Use for segment-level revenue analysis.",
         category="segments",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "period": {"type": "str", "required": False, "default": "quarter"},
-            "limit": {"type": "int", "required": False, "default": None},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Segment revenue analysis",
             "Revenue by segment breakdown",
@@ -906,11 +663,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="revenue_geographic_segmentation",
         description="Geographic revenue: revenue by region/country. Shows global market presence and regional sales breakdown.",
         category="segments",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "period": {"type": "str", "required": False, "default": "quarter"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Geographic exposure analysis",
             "International expansion tracking",
@@ -926,10 +678,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="employee_count",
         description="Current number of employees at a company.",
         category="company",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Company size assessment",
             "Workforce analysis",
@@ -941,10 +689,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="historical_employee_count",
         description="Historical employee count showing workforce growth or decline over time.",
         category="company",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Workforce growth analysis",
             "Operational scaling assessment",
@@ -956,10 +700,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="executive_compensation",
         description="Executive compensation data from proxy filings.",
         category="company",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Executive pay analysis",
             "Compensation benchmarking",
@@ -972,10 +712,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="compensation_benchmark",
         description="Executive compensation benchmarks for a specific year.",
         category="company",
-        parameters={
-            "year": {"type": "int", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Industry compensation comparison",
             "Pay benchmarking",
@@ -987,10 +723,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="company_notes",
         description="Company notes and additional information.",
         category="company",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Additional company context",
             "Notes and observations",
@@ -1005,10 +737,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="search_mergers_acquisitions",
         description="Search for M&A deals by company name.",
         category="corporate_actions",
-        parameters={
-            "name": {"type": "str", "required": True, "description": "Company name to search"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "M&A activity research",
             "Deal history lookup",
@@ -1021,10 +749,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="mergers_acquisitions_rss_feed",
         description="RSS feed of latest M&A news and announcements.",
         category="news",
-        parameters={
-            "page": {"type": "int", "required": False, "default": 0},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Real-time M&A monitoring",
             "Deal flow tracking",
@@ -1039,14 +763,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="stock_news",
         description="Stock-specific news articles from various sources.",
         category="news",
-        parameters={
-            "tickers": {"type": "str or list", "required": False, "description": "Stock symbol(s)"},
-            "limit": {"type": "int", "required": False, "default": 25},
-            "page": {"type": "int", "required": False, "default": 0},
-            "from_date": {"type": "str", "required": False, "description": "YYYY-MM-DD"},
-            "to_date": {"type": "str", "required": False, "description": "YYYY-MM-DD"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Company-specific news tracking",
             "Event-driven analysis",
@@ -1059,10 +775,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="general_news",
         description="General financial and market news from various sources.",
         category="news",
-        parameters={
-            "pages": {"type": "int", "required": False, "default": 20},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Market news overview",
             "General financial coverage",
@@ -1074,11 +786,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="fmp_articles",
         description="Articles published by Financial Modeling Prep.",
         category="news",
-        parameters={
-            "page": {"type": "int", "required": False, "default": 0},
-            "size": {"type": "int", "required": False, "default": 25},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "FMP analysis and research",
             "Educational content",
@@ -1090,12 +797,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="press_releases",
         description="Company press releases with official announcements.",
         category="news",
-        parameters={
-            "symbol": {"type": "str", "required": False, "description": "Stock symbol (optional)"},
-            "limit": {"type": "int", "required": False, "default": 10},
-            "page": {"type": "int", "required": False, "default": 0},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Official company announcements",
             "Corporate communications tracking",
@@ -1108,10 +809,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="upgrades_downgrades_rss_feed",
         description="RSS feed of latest analyst upgrades and downgrades.",
         category="news",
-        parameters={
-            "page": {"type": "int", "required": False, "default": 0},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Real-time rating changes",
             "Analyst action monitoring",
@@ -1126,13 +823,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="earning_calendar",
         description="Earnings announcement calendar showing upcoming and past earnings dates.",
         category="calendar",
-        parameters={
-            "from_date": {"type": "str", "required": False, "description": "YYYY-MM-DD"},
-            "to_date": {"type": "str", "required": False, "description": "YYYY-MM-DD"},
-            "estimate_required": {"type": "bool", "required": False, "default": True},
-            "revenue_minimum": {"type": "float", "required": False, "default": 1000000000},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Earnings season tracking",
             "Upcoming earnings dates",
@@ -1145,11 +835,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="historical_earning_calendar",
         description="Historical and upcoming earnings dates for a specific company.",
         category="calendar",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "limit": {"type": "int", "required": False, "default": 10},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Company-specific earnings history",
             "Earnings pattern analysis",
@@ -1161,11 +846,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="dividend_calendar",
         description="Dividend payment calendar showing upcoming dividend dates.",
         category="calendar",
-        parameters={
-            "from_date": {"type": "str", "required": False, "description": "YYYY-MM-DD"},
-            "to_date": {"type": "str", "required": False, "description": "YYYY-MM-DD (max 3 months)"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Dividend income planning",
             "Ex-dividend date tracking",
@@ -1178,11 +858,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="ipo_calendar",
         description="IPO calendar showing upcoming and recent initial public offerings.",
         category="calendar",
-        parameters={
-            "from_date": {"type": "str", "required": False, "description": "YYYY-MM-DD"},
-            "to_date": {"type": "str", "required": False, "description": "YYYY-MM-DD"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "IPO tracking",
             "New listing research",
@@ -1194,11 +869,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="stock_split_calendar",
         description="Stock split calendar showing upcoming splits.",
         category="calendar",
-        parameters={
-            "from_date": {"type": "str", "required": False, "description": "YYYY-MM-DD"},
-            "to_date": {"type": "str", "required": False, "description": "YYYY-MM-DD"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Split event tracking",
             "Corporate action monitoring",
@@ -1210,14 +880,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="economic_calendar",
         description="Economic events calendar with GDP, CPI, employment data releases.",
         category="calendar",
-        parameters={
-            "from_date": {"type": "str", "required": False, "description": "YYYY-MM-DD"},
-            "to_date": {"type": "str", "required": False, "description": "YYYY-MM-DD"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-            "impact_filter": {"type": "str or list", "required": False, "default": ["High"], "options": ["Low", "Medium", "High"]},
-            "country_filter": {"type": "str or list", "required": False},
-            "currency_filter": {"type": "str or list", "required": False},
-        },
         example_use_cases=[
             "Macro event tracking",
             "Economic data releases",
@@ -1233,10 +895,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="quote",
         description="Real-time full quote with bid/ask, volume, price, and daily statistics.",
         category="market",
-        parameters={
-            "symbol": {"type": "str or list", "required": True, "description": "Stock symbol(s)"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Real-time price lookup",
             "Current market data",
@@ -1249,10 +907,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="quote_short",
         description="Simplified real-time quote with just price, change, and volume.",
         category="market",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Quick price check",
             "Simple market snapshot",
@@ -1264,12 +918,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="historical_price_full",
         description="Daily historical OHLCV price data for up to 5 years.",
         category="market",
-        parameters={
-            "symbol": {"type": "str or list", "required": True},
-            "from_date": {"type": "str", "required": False, "description": "YYYY-MM-DD"},
-            "to_date": {"type": "str", "required": False, "description": "YYYY-MM-DD"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Historical price analysis",
             "Trend analysis",
@@ -1283,14 +931,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="historical_chart",
         description="Intraday and daily historical price data with various timeframes.",
         category="market",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "timeframe": {"type": "str", "required": True, "options": ["1min", "5min", "15min", "30min", "1hour", "4hour", "1day"]},
-            "from_date": {"type": "str", "required": True, "description": "YYYY-MM-DD"},
-            "to_date": {"type": "str", "required": True, "description": "YYYY-MM-DD"},
-            "time_series": {"type": "str", "required": False, "default": "line", "description": "Time series parameter"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Intraday analysis",
             "Short-term trading",
@@ -1303,10 +943,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="multiple_company_prices",
         description="Real-time prices for multiple companies in a single request.",
         category="market",
-        parameters={
-            "symbols": {"type": "str or list", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Portfolio monitoring",
             "Batch price lookup",
@@ -1322,9 +958,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="actives",
         description="Most actively traded stocks by volume.",
         category="market",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Market activity monitoring",
             "High volume stock discovery",
@@ -1337,9 +970,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="gainers",
         description="Stocks with the biggest gains today.",
         category="market",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Daily winners tracking",
             "Momentum stock discovery",
@@ -1351,9 +981,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="losers",
         description="Stocks with the biggest losses today.",
         category="market",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Daily losers tracking",
             "Sell-off monitoring",
@@ -1366,10 +993,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="sectors_performance",
         description="Current performance by sector.",
         category="market",
-        parameters={
-            "limit": {"type": "int", "required": False, "default": 10},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Sector rotation analysis",
             "Market breadth assessment",
@@ -1381,11 +1004,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="historical_sectors_performance",
         description="Historical sector performance over time.",
         category="market",
-        parameters={
-            "from_date": {"type": "str", "required": True, "description": "YYYY-MM-DD"},
-            "to_date": {"type": "str", "required": True, "description": "YYYY-MM-DD"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Sector trend analysis",
             "Historical rotation patterns",
@@ -1397,9 +1015,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="market_hours",
         description="Market hours information for exchanges.",
         category="market",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Trading schedule lookup",
             "Market timing",
@@ -1411,10 +1026,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="is_market_open",
         description="Check if a market/exchange is currently open.",
         category="market",
-        parameters={
-            "exchange": {"type": "str", "required": False, "default": "NASDAQ"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Market status check",
             "Trading availability",
@@ -1429,9 +1040,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="indexes",
         description="Major market indexes (S&P 500, Dow Jones, NASDAQ, etc.).",
         category="indexes",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Market benchmark tracking",
             "Index performance comparison",
@@ -1443,9 +1051,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="sp500_constituent",
         description="Current S&P 500 constituents list.",
         category="indexes",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "S&P 500 stock list",
             "Index composition analysis",
@@ -1457,9 +1062,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="historical_sp500_constituent",
         description="Historical S&P 500 additions and removals.",
         category="indexes",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Index changes tracking",
             "Historical composition",
@@ -1471,9 +1073,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="nasdaq_constituent",
         description="Current NASDAQ 100 constituents list.",
         category="indexes",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "NASDAQ 100 stock list",
             "Tech index composition",
@@ -1485,9 +1084,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="historical_nasdaq_constituent",
         description="Historical NASDAQ additions and removals.",
         category="indexes",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "NASDAQ changes tracking",
         ],
@@ -1498,9 +1094,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="dowjones_constituent",
         description="Current Dow Jones Industrial Average constituents.",
         category="indexes",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "DJIA stock list",
             "Blue chip analysis",
@@ -1512,9 +1105,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="historical_dowjones_constituent",
         description="Historical Dow Jones additions and removals.",
         category="indexes",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "DJIA changes tracking",
         ],
@@ -1528,10 +1118,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="institutional_holders",
         description="Major institutional investors holding a stock.",
         category="ownership",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Institutional ownership analysis",
             "Smart money tracking",
@@ -1544,10 +1130,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="mutual_fund_holders",
         description="Mutual funds holding a stock.",
         category="ownership",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Mutual fund ownership tracking",
             "Fund flow analysis",
@@ -1559,10 +1141,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="etf_holders",
         description="ETFs holding a specific stock.",
         category="ownership",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "ETF exposure analysis",
             "Passive ownership tracking",
@@ -1574,11 +1152,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="form_13f",
         description="Form 13F filings showing institutional holdings over $100M AUM.",
         category="ownership",
-        parameters={
-            "cik_id": {"type": "str", "required": True, "description": "CIK of institution"},
-            "date": {"type": "str", "required": False, "description": "YYYY-MM-DD"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Institutional portfolio analysis",
             "Hedge fund tracking",
@@ -1593,10 +1166,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="etf_sector_weightings",
         description="Sector weightings for an ETF.",
         category="etf",
-        parameters={
-            "symbol": {"type": "str", "required": True, "description": "ETF symbol"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "ETF sector exposure analysis",
             "Portfolio diversification assessment",
@@ -1608,10 +1177,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="etf_country_weightings",
         description="Country/geographic weightings for an ETF.",
         category="etf",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Geographic exposure analysis",
             "International diversification",
@@ -1626,13 +1191,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="insider_trading",
         description="Insider trading transactions (Form 4 filings).",
         category="ownership",
-        parameters={
-            "symbol": {"type": "str", "required": False},
-            "reporting_cik": {"type": "int", "required": False},
-            "company_cik": {"type": "int", "required": False},
-            "limit": {"type": "int", "required": False, "default": 10},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Insider sentiment analysis",
             "Executive trading patterns",
@@ -1646,10 +1204,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="insider_trading_rss_feed",
         description="Real-time RSS feed of insider trading activity.",
         category="ownership",
-        parameters={
-            "limit": {"type": "int", "required": False, "default": 10},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Real-time insider activity monitoring",
             "Breaking insider trades",
@@ -1664,9 +1218,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="senate_trading_rss",
         description="RSS feed of Senate member stock trades.",
         category="ownership",
-        parameters={
-            "page": {"type": "int", "required": False, "default": 0},
-        },
         example_use_cases=[
             "Congressional trading tracking",
             "Political insider trading",
@@ -1678,9 +1229,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="senate_trading_symbol",
         description="Senate trades filtered by stock symbol.",
         category="ownership",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-        },
         example_use_cases=[
             "Congressional trades in specific stocks",
         ],
@@ -1691,9 +1239,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="senate_disclosure_rss",
         description="RSS feed of Senate financial disclosures.",
         category="ownership",
-        parameters={
-            "page": {"type": "int", "required": False, "default": 0},
-        },
         example_use_cases=[
             "Senate disclosure monitoring",
         ],
@@ -1704,9 +1249,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="senate_disclosure_symbol",
         description="Senate disclosures filtered by stock symbol.",
         category="ownership",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-        },
         example_use_cases=[
             "Senate holdings in specific stocks",
         ],
@@ -1720,10 +1262,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="historical_stock_dividend",
         description="Historical dividend payments for a company.",
         category="dividends",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Dividend history analysis",
             "Dividend growth tracking",
@@ -1736,10 +1274,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="historical_stock_split",
         description="Historical stock splits for a company.",
         category="corporate_actions",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Split history analysis",
             "Price adjustment research",
@@ -1754,11 +1288,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="shares_float",
         description="Shares float - publicly traded shares available for trading.",
         category="market",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "all": {"type": "bool", "required": False, "default": False},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Float analysis",
             "Short squeeze potential",
@@ -1771,10 +1300,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="historical_share_float",
         description="Historical shares float data over time.",
         category="market",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Float changes over time",
             "Dilution tracking",
@@ -1789,11 +1314,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="historical_social_sentiment",
         description="Historical social media sentiment for a stock.",
         category="sentiment",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "page": {"type": "int", "required": False, "default": 0},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Social sentiment trends",
             "Retail investor sentiment",
@@ -1805,11 +1325,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="trending_social_sentiment",
         description="Currently trending stocks by social sentiment.",
         category="sentiment",
-        parameters={
-            "sentiment_type": {"type": "str", "required": False, "default": "bullish", "options": ["bullish", "bearish"]},
-            "source": {"type": "str", "required": False, "default": "stocktwits", "options": ["stocktwits", "twitter"]},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Trending stock discovery",
             "Social momentum tracking",
@@ -1821,11 +1336,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="social_sentiment_changes",
         description="Changes in social sentiment over time.",
         category="sentiment",
-        parameters={
-            "sentiment_type": {"type": "str", "required": False, "default": "bullish"},
-            "source": {"type": "str", "required": False, "default": "stocktwits"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Sentiment shift detection",
             "Momentum changes",
@@ -1840,13 +1350,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="technical_indicators",
         description="Technical indicators (SMA, EMA, WMA, DEMA, TEMA, RSI, ADX, Williams %R, Standard Deviation).",
         category="technical",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "period": {"type": "int", "required": False, "default": 10},
-            "statistics_type": {"type": "str", "required": False, "default": "sma", "options": ["sma", "ema", "wma", "dema", "tema", "williams", "rsi", "adx", "standardDeviation"]},
-            "time_delta": {"type": "str", "required": False, "default": "1day", "options": ["1min", "5min", "15min", "30min", "1hour", "4hour", "1day", "1week", "1month", "1year"]},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Technical analysis",
             "Trading signals",
@@ -1862,11 +1365,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="treasury_rates",
         description="US Treasury rates across all maturities.",
         category="economics",
-        parameters={
-            "from_date": {"type": "str", "required": False},
-            "to_date": {"type": "str", "required": False},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Interest rate analysis",
             "Yield curve research",
@@ -1879,12 +1377,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="economic_indicators",
         description="Economic indicators (GDP, CPI, unemployment, etc.).",
         category="economics",
-        parameters={
-            "name": {"type": "str", "required": True, "description": "Indicator name (GDP, CPI, unemploymentRate, etc.)"},
-            "from_date": {"type": "str", "required": False},
-            "to_date": {"type": "str", "required": False},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Macro economic analysis",
             "GDP tracking",
@@ -1897,10 +1389,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="market_risk_premium",
         description="Market risk premium by country for CAPM calculations.",
         category="economics",
-        parameters={
-            "country": {"type": "str", "required": False},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "CAPM calculations",
             "Cost of equity estimation",
@@ -1915,9 +1403,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="forex",
         description="Real-time forex prices for all currency pairs.",
         category="forex",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Currency rate lookup",
             "FX market overview",
@@ -1929,9 +1414,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="forex_list",
         description="Full quote list for all forex currency pairs.",
         category="forex",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Complete FX market data",
         ],
@@ -1942,10 +1424,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="forex_quote",
         description="Full quote for a specific forex pair.",
         category="forex",
-        parameters={
-            "symbol": {"type": "str", "required": True, "description": "Currency pair (e.g., 'EURUSD')"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Specific currency pair quote",
         ],
@@ -1956,12 +1434,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="forex_historical",
         description="Historical forex data for a currency pair.",
         category="forex",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "from_date": {"type": "str", "required": True},
-            "to_date": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Historical FX analysis",
             "Currency trend research",
@@ -1976,10 +1448,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="cryptocurrency_quote",
         description="Real-time cryptocurrency quote.",
         category="crypto",
-        parameters={
-            "symbol": {"type": "str", "required": True, "description": "Crypto pair (e.g., 'BTCUSD')"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Crypto price lookup",
             "Bitcoin/Ethereum quotes",
@@ -1991,9 +1459,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="cryptocurrencies_list",
         description="Full quotes for all cryptocurrencies.",
         category="crypto",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Full crypto market overview",
         ],
@@ -2007,12 +1472,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="commodity_price",
         description="Historical commodity price data.",
         category="commodities",
-        parameters={
-            "symbol": {"type": "str", "required": True, "description": "Commodity symbol (e.g., 'ZGUSD')"},
-            "from_date": {"type": "str", "required": False},
-            "to_date": {"type": "str", "required": False},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Commodity price analysis",
             "Gold/oil/silver prices",
@@ -2024,9 +1483,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="commodities_list",
         description="Full quotes for all commodities.",
         category="commodities",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Commodities market overview",
         ],
@@ -2040,26 +1496,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="stock_screener",
         description="Screen stocks based on financial criteria (market cap, beta, dividend, etc.).",
         category="screener",
-        parameters={
-            "market_cap_more_than": {"type": "float", "required": False},
-            "market_cap_lower_than": {"type": "float", "required": False},
-            "beta_more_than": {"type": "float", "required": False},
-            "beta_lower_than": {"type": "float", "required": False},
-            "volume_more_than": {"type": "float", "required": False},
-            "volume_lower_than": {"type": "float", "required": False},
-            "dividend_more_than": {"type": "float", "required": False},
-            "dividend_lower_than": {"type": "float", "required": False},
-            "price_more_than": {"type": "float", "required": False},
-            "price_lower_than": {"type": "float", "required": False},
-            "is_etf": {"type": "bool", "required": False},
-            "is_fund": {"type": "bool", "required": False},
-            "is_actively_trading": {"type": "bool", "required": False},
-            "sector": {"type": "str", "required": False},
-            "industry": {"type": "str", "required": False},
-            "country": {"type": "str", "required": False},
-            "exchange": {"type": "str or list", "required": False},
-            "limit": {"type": "int", "required": False, "default": 10},
-        },
         example_use_cases=[
             "Investment screening",
             "Stock discovery by criteria",
@@ -2075,11 +1511,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="search",
         description="Search for stocks, ETFs, and financial instruments by name or ticker.",
         category="search",
-        parameters={
-            "query": {"type": "str", "required": False, "description": "Search query"},
-            "limit": {"type": "int", "required": False, "default": 10},
-            "exchange": {"type": "str", "required": False},
-        },
         example_use_cases=[
             "Find stock by name",
             "Ticker lookup",
@@ -2091,11 +1522,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="search_ticker",
         description="Search specifically for ticker symbols.",
         category="search",
-        parameters={
-            "query": {"type": "str", "required": False},
-            "limit": {"type": "int", "required": False, "default": 10},
-            "exchange": {"type": "str", "required": False},
-        },
         example_use_cases=[
             "Ticker symbol lookup",
         ],
@@ -2109,9 +1535,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="symbols_list",
         description="Full list of all available stock symbols.",
         category="reference",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Complete stock universe",
         ],
@@ -2122,9 +1545,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="etf_list",
         description="Full list of all available ETFs.",
         category="reference",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "ETF universe",
         ],
@@ -2135,7 +1555,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="available_traded_list",
         description="List of all tradable symbols.",
         category="reference",
-        parameters={},
         example_use_cases=[
             "Tradable securities list",
         ],
@@ -2146,7 +1565,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="available_forex",
         description="List of available forex currency pairs.",
         category="reference",
-        parameters={},
         example_use_cases=[
             "FX pair availability",
         ],
@@ -2157,9 +1575,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="available_cryptocurrencies",
         description="List of available cryptocurrencies.",
         category="reference",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Crypto availability",
         ],
@@ -2170,7 +1585,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="available_commodities",
         description="List of available commodities.",
         category="reference",
-        parameters={},
         example_use_cases=[
             "Commodity availability",
         ],
@@ -2181,7 +1595,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="available_etfs",
         description="List of available ETFs.",
         category="reference",
-        parameters={},
         example_use_cases=[
             "ETF availability",
         ],
@@ -2192,9 +1605,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="available_indexes",
         description="List of available market indexes.",
         category="reference",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Index availability",
         ],
@@ -2205,7 +1615,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="available_sectors",
         description="List of available market sectors.",
         category="reference",
-        parameters={},
         example_use_cases=[
             "Sector list for screening",
         ],
@@ -2216,7 +1625,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="available_industries",
         description="List of available industries.",
         category="reference",
-        parameters={},
         example_use_cases=[
             "Industry list for screening",
         ],
@@ -2227,7 +1635,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="available_exchanges",
         description="List of available stock exchanges.",
         category="reference",
-        parameters={},
         example_use_cases=[
             "Exchange list",
         ],
@@ -2238,7 +1645,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="all_countries",
         description="List of all countries with market data.",
         category="reference",
-        parameters={},
         example_use_cases=[
             "Country availability",
         ],
@@ -2249,9 +1655,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="delisted_companies",
         description="List of delisted companies.",
         category="reference",
-        parameters={
-            "limit": {"type": "int", "required": False, "default": 10},
-        },
         example_use_cases=[
             "Historical delisting tracking",
         ],
@@ -2262,9 +1665,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="financial_statement_symbol_lists",
         description="Symbols with available financial statements.",
         category="reference",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Find companies with financials",
         ],
@@ -2278,10 +1678,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="cik",
         description="Get company name by CIK.",
         category="reference",
-        parameters={
-            "cik_id": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "CIK to company lookup",
         ],
@@ -2292,9 +1688,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="cik_list",
         description="Full list of CIK numbers.",
         category="reference",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "CIK database",
         ],
@@ -2305,10 +1698,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="cik_search",
         description="Search for CIK by company name.",
         category="reference",
-        parameters={
-            "name": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Find CIK by name",
         ],
@@ -2319,10 +1708,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="cusip",
         description="CUSIP mapper for CIK.",
         category="reference",
-        parameters={
-            "cik_id": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "CUSIP lookup",
         ],
@@ -2333,10 +1718,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="mapper_cik_name",
         description="Map CIK to insider names.",
         category="reference",
-        parameters={
-            "name": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Find CIK for insider",
         ],
@@ -2347,10 +1728,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="mapper_cik_company",
         description="Map ticker to company CIK.",
         category="reference",
-        parameters={
-            "ticker": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Find CIK for ticker",
         ],
@@ -2364,9 +1741,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="commitment_of_traders_report_list",
         description="List of available COT report symbols.",
         category="alternative",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "COT report availability",
         ],
@@ -2377,12 +1751,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="commitment_of_traders_report",
         description="CFTC Commitment of Traders report data.",
         category="alternative",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "from_date": {"type": "str", "required": False},
-            "to_date": {"type": "str", "required": False},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Futures positioning analysis",
             "Speculator vs hedger activity",
@@ -2394,12 +1762,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="commitment_of_traders_report_analysis",
         description="Analysis of COT report data.",
         category="alternative",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "from_date": {"type": "str", "required": True},
-            "to_date": {"type": "str", "required": True},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "COT trend analysis",
         ],
@@ -2410,11 +1772,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="fail_to_deliver",
         description="Fail-to-deliver data showing settlement failures.",
         category="alternative",
-        parameters={
-            "symbol": {"type": "str", "required": True},
-            "page": {"type": "int", "required": False, "default": 0},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Short selling analysis",
             "Settlement issues tracking",
@@ -2426,11 +1783,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="sector_pe_ratio",
         description="Sector-level P/E ratios.",
         category="valuation",
-        parameters={
-            "date": {"type": "str", "required": True, "description": "YYYY-MM-DD"},
-            "exchange": {"type": "str", "required": False, "default": "NYSE"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Sector valuation comparison",
         ],
@@ -2441,11 +1793,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="industry_pe_ratio",
         description="Industry-level P/E ratios.",
         category="valuation",
-        parameters={
-            "date": {"type": "str", "required": True, "description": "YYYY-MM-DD"},
-            "exchange": {"type": "str", "required": False, "default": "NYSE"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Industry valuation comparison",
         ],
@@ -2456,10 +1803,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="batch_eod_prices",
         description="End of day prices for all stocks on a specific date.",
         category="market",
-        parameters={
-            "date": {"type": "str", "required": True, "description": "YYYY-MM-DD"},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Historical EOD snapshot",
             "Bulk price data",
@@ -2471,10 +1814,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="sec_rss_feeds",
         description="SEC RSS feed of latest filings.",
         category="sec",
-        parameters={
-            "limit": {"type": "int", "required": False, "default": 10},
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=[
             "Latest SEC filings",
             "Real-time filing monitoring",
@@ -2486,9 +1825,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="exchange_realtime",
         description="Real-time quotes for all stocks on an exchange.",
         category="market",
-        parameters={
-            "exchange": {"type": "str", "required": True, "description": "Exchange symbol"},
-        },
         example_use_cases=[
             "Exchange-wide real-time data",
         ],
@@ -2502,9 +1838,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="crowdfunding_rss_feed",
         description="RSS feed of crowdfunding campaigns.",
         category="alternative",
-        parameters={
-            "page": {"type": "int", "required": False, "default": 0},
-        },
         example_use_cases=[
             "Crowdfunding monitoring",
         ],
@@ -2515,9 +1848,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="crowdfunding_search",
         description="Search crowdfunding campaigns by name.",
         category="alternative",
-        parameters={
-            "name": {"type": "str", "required": True},
-        },
         example_use_cases=[
             "Find specific crowdfunding campaigns",
         ],
@@ -2528,9 +1858,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="crowdfunding_by_cik",
         description="Crowdfunding campaigns by company CIK.",
         category="alternative",
-        parameters={
-            "cik": {"type": "str", "required": True},
-        },
         example_use_cases=[
             "Company-specific crowdfunding",
         ],
@@ -2542,7 +1869,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="available_mutual_funds",
         description="List of available mutual funds.",
         category="reference",
-        parameters={},
         example_use_cases=["Mutual fund availability"],
         returns="Available mutual funds.",
     ),
@@ -2551,7 +1877,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="available_tsx",
         description="List of available TSX symbols.",
         category="reference",
-        parameters={},
         example_use_cases=["TSX availability"],
         returns="Available TSX symbols.",
     ),
@@ -2560,9 +1885,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="available_euronext",
         description="List of available Euronext stocks.",
         category="reference",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=["Euronext availability"],
         returns="Available Euronext stocks.",
     ),
@@ -2571,9 +1893,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="mutual_fund_list",
         description="Full quotes for all mutual funds.",
         category="market",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown"},
-        },
         example_use_cases=["Mutual fund quotes"],
         returns="All mutual fund quotes.",
     ),
@@ -2582,7 +1901,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="tsx_list",
         description="TSX stocks data.",
         category="market",
-        parameters={},
         example_use_cases=["TSX market data"],
         returns="TSX stocks data.",
     ),
@@ -2594,10 +1912,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="income_statement_ttm",
         description="Trailing twelve months (TTM) income statement data. Aggregates the most recent 12 months of data regardless of fiscal year.",
         category="financials",
-        parameters={
-            "symbol": {"type": "str", "required": True, "description": "Stock ticker (e.g., 'AAPL')"},
-            "output": {"type": "str", "required": False, "default": "markdown", "options": ["markdown", "json", "tsv"]},
-        },
         example_use_cases=[
             "Current profitability analysis without waiting for quarterly reports",
             "Rolling 12-month revenue trend analysis",
@@ -2610,10 +1924,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="balance_sheet_statement_ttm",
         description="Most recent balance sheet snapshot showing current financial position.",
         category="financials",
-        parameters={
-            "symbol": {"type": "str", "required": True, "description": "Stock ticker (e.g., 'AAPL')"},
-            "output": {"type": "str", "required": False, "default": "markdown", "options": ["markdown", "json", "tsv"]},
-        },
         example_use_cases=[
             "Current asset and liability analysis",
             "Latest equity position assessment",
@@ -2626,10 +1936,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="cash_flow_statement_ttm",
         description="Trailing twelve months (TTM) cash flow statement. Shows rolling 12-month cash generation and usage.",
         category="financials",
-        parameters={
-            "symbol": {"type": "str", "required": True, "description": "Stock ticker (e.g., 'AAPL')"},
-            "output": {"type": "str", "required": False, "default": "markdown", "options": ["markdown", "json", "tsv"]},
-        },
         example_use_cases=[
             "Current free cash flow analysis",
             "Rolling cash generation trends",
@@ -2642,11 +1948,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="latest_financial_statements",
         description="Paginated list of the most recently filed financial statements across all companies. Useful for monitoring new filings.",
         category="financials",
-        parameters={
-            "page": {"type": "int", "required": False, "default": 0, "description": "Page number (0-indexed)"},
-            "limit": {"type": "int", "required": False, "default": 250, "description": "Results per page"},
-            "output": {"type": "str", "required": False, "default": "markdown", "options": ["markdown", "json", "tsv"]},
-        },
         example_use_cases=[
             "Monitor new SEC filings across the market",
             "Track recently updated financials",
@@ -2659,10 +1960,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="earning_call_transcript_latest",
         description="Most recent earnings call transcript for a company. Quick access without specifying year/quarter.",
         category="earnings",
-        parameters={
-            "symbol": {"type": "str", "required": True, "description": "Stock ticker (e.g., 'AAPL')"},
-            "output": {"type": "str", "required": False, "default": "markdown", "options": ["markdown", "json", "tsv"]},
-        },
         example_use_cases=[
             "Quick access to latest management commentary",
             "Recent earnings call analysis",
@@ -2676,10 +1973,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="ratings_snapshot",
         description="Snapshot of analyst ratings showing buy/hold/sell recommendations distribution.",
         category="analysts",
-        parameters={
-            "symbol": {"type": "str", "required": True, "description": "Stock ticker (e.g., 'AAPL')"},
-            "output": {"type": "str", "required": False, "default": "markdown", "options": ["markdown", "json", "tsv"]},
-        },
         example_use_cases=[
             "Quick analyst sentiment overview",
             "Buy/sell recommendation counts",
@@ -2692,10 +1985,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="grades_consensus",
         description="Consensus grade from analyst ratings aggregated into a single recommendation.",
         category="analysts",
-        parameters={
-            "symbol": {"type": "str", "required": True, "description": "Stock ticker (e.g., 'AAPL')"},
-            "output": {"type": "str", "required": False, "default": "markdown", "options": ["markdown", "json", "tsv"]},
-        },
         example_use_cases=[
             "Overall analyst consensus rating",
             "Aggregated market opinion",
@@ -2708,10 +1997,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="aftermarket_trade",
         description="After-hours trading data including price, volume, and timestamp. Shows extended hours activity.",
         category="market",
-        parameters={
-            "symbol": {"type": "str", "required": True, "description": "Stock ticker (e.g., 'AAPL')"},
-            "output": {"type": "str", "required": False, "default": "markdown", "options": ["markdown", "json", "tsv"]},
-        },
         example_use_cases=[
             "Monitor after-hours price movements",
             "Track extended hours volume",
@@ -2724,10 +2009,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="aftermarket_quote",
         description="After-hours quote data including bid/ask prices. Shows extended hours pricing.",
         category="market",
-        parameters={
-            "symbol": {"type": "str", "required": True, "description": "Stock ticker (e.g., 'AAPL')"},
-            "output": {"type": "str", "required": False, "default": "markdown", "options": ["markdown", "json", "tsv"]},
-        },
         example_use_cases=[
             "After-hours bid/ask spread analysis",
             "Extended hours market sentiment",
@@ -2740,9 +2021,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="industry_performance_snapshot",
         description="Current performance metrics for all market industries. Shows which industries are outperforming or underperforming.",
         category="market",
-        parameters={
-            "output": {"type": "str", "required": False, "default": "markdown", "options": ["markdown", "json", "tsv"]},
-        },
         example_use_cases=[
             "Industry sector comparison",
             "Identify outperforming sectors",
@@ -2755,10 +2033,6 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         function="holidays_by_exchange",
         description="Market holidays for a specific exchange. Shows when markets are closed.",
         category="market",
-        parameters={
-            "exchange": {"type": "str", "required": True, "description": "Exchange name (e.g., 'NASDAQ', 'NYSE')"},
-            "output": {"type": "str", "required": False, "default": "markdown", "options": ["markdown", "json", "tsv"]},
-        },
         example_use_cases=[
             "Trading calendar planning",
             "Market closure schedule",

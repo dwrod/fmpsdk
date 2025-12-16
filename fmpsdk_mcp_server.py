@@ -125,10 +125,12 @@ def discover_fmpsdk_functions() -> Dict[str, Dict[str, Any]]:
                     logger.warning(f"Function {func_name} not found or not callable")
                     continue
 
-                # Use registry metadata for better descriptions
+                # GEN-92: Extract parameters from function signatures (source of truth)
+                # Use registry for description only
+                sig_info = get_function_signature_and_docs(func)
                 func_info = {
-                    "parameters": endpoint.parameters,
-                    "description": endpoint.description,
+                    "parameters": sig_info["parameters"],  # From function signature
+                    "description": endpoint.description,   # From registry (curated)
                     "function": func,
                 }
                 functions[func_name] = func_info

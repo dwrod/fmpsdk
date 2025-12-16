@@ -886,7 +886,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
     "sales_revenue_by_segments": FMPEndpoint(
         name="sales_revenue_by_segments",
         function="sales_revenue_by_segments",
-        description="Revenue breakdown by business segments (product lines, services, etc.).",
+        description="Segment revenue: revenue breakdown by business segments, product lines, services. Use for segment-level revenue analysis.",
         category="segments",
         parameters={
             "symbol": {"type": "str", "required": True},
@@ -895,16 +895,16 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "output": {"type": "str", "required": False, "default": "markdown"},
         },
         example_use_cases=[
-            "Business segment analysis",
-            "Product line performance tracking",
-            "Diversification assessment",
+            "Segment revenue analysis",
+            "Revenue by segment breakdown",
+            "Product line revenue tracking",
         ],
         returns="Revenue by segment with date and segment-specific revenue values.",
     ),
     "revenue_geographic_segmentation": FMPEndpoint(
         name="revenue_geographic_segmentation",
         function="revenue_geographic_segmentation",
-        description="Revenue breakdown by geographic region showing global market presence.",
+        description="Geographic revenue: revenue by region/country. Shows global market presence and regional sales breakdown.",
         category="segments",
         parameters={
             "symbol": {"type": "str", "required": True},

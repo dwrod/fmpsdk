@@ -2162,6 +2162,47 @@ def get_all_categories() -> List[str]:
     return list(CATEGORIES.keys())
 
 
+def _format_parameters_from_function(func_name: str) -> str:
+    """
+    Extract and format parameters from an fmpsdk function signature.
+
+    GEN-93: Runtime parameter extraction for LLM context.
+    This ensures parameter info stays in sync with actual function signatures.
+
+    :param func_name: Name of the fmpsdk function.
+    :return: Formatted parameter string, or empty string if function not found.
+    """
+    import inspect
+    try:
+        import fmpsdk
+        func = getattr(fmpsdk, func_name, None)
+        if func is None or not callable(func):
+            return ""
+
+        sig = inspect.signature(func)
+        parts = []
+
+        for param_name, param in sig.parameters.items():
+            # Skip internal params not useful for LLM
+            if param_name in ('download', 'filename'):
+                continue
+
+            if param.default == inspect.Parameter.empty:
+                # Required parameter
+                parts.append(f"{param_name} (required)")
+            else:
+                # Optional with default
+                default = param.default
+                if default is None:
+                    parts.append(param_name)
+                else:
+                    parts.append(f"{param_name}={default}")
+
+        return ", ".join(parts) if parts else ""
+    except Exception:
+        return ""
+
+
 def get_registry_for_llm(
     categories: Optional[List[str]] = None,
     include_parameters: bool = True,
@@ -2205,9 +2246,14 @@ def get_registry_for_llm(
             lines.append(f"**Function:** `fmpsdk.{ep.function}()`")
             lines.append(f"**Description:** {ep.description}")
 
-            # GEN-93: Show example instead of parameters (parameters removed in GEN-92)
-            if include_parameters and ep.example:
-                lines.append(f"**Example:** `{ep.example}`")
+            # GEN-93: Show both example AND parameters for completeness
+            if include_parameters:
+                if ep.example:
+                    lines.append(f"**Example:** `{ep.example}`")
+                # Always include parameters from function signature
+                params = _format_parameters_from_function(ep.function)
+                if params:
+                    lines.append(f"**Parameters:** {params}")
 
             # Use cases
             if include_use_cases and ep.example_use_cases:
@@ -2247,11 +2293,14 @@ def get_compact_registry_for_llm() -> str:
 
         lines.append(f"## {cat.upper()}: {desc}")
         for ep in endpoints:
-            # GEN-93: Use example if available, otherwise just function name
+            # GEN-93: Include both example AND parameters for completeness
+            params = _format_parameters_from_function(ep.function)
+            entry = f"- **{ep.name}**: {ep.description[:60]}..."
             if ep.example:
-                lines.append(f"- **{ep.name}**: {ep.description[:80]}... Example: `{ep.example}`")
-            else:
-                lines.append(f"- **{ep.name}**: {ep.description[:100]}...")
+                entry += f" Ex: `{ep.example}`"
+            if params:
+                entry += f" Params: {params}"
+            lines.append(entry)
         lines.append("")
 
     return "\n".join(lines)

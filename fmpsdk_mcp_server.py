@@ -97,23 +97,61 @@ def get_function_signature_and_docs(func) -> Dict[str, Any]:
         }
 
 def discover_fmpsdk_functions() -> Dict[str, Dict[str, Any]]:
-    """Discover all available functions in the fmpsdk package."""
+    """
+    Discover all available functions in the fmpsdk package.
+
+    GEN-91: Uses FMP_REGISTRY as source of truth with whitelist validation.
+    This ensures only curated API endpoints are exposed, not helper functions.
+    """
     functions = {}
-    
-    # Get all exported functions from fmpsdk's __all__ list
-    if hasattr(fmpsdk, '__all__'):
-        for func_name in fmpsdk.__all__:
+
+    # GEN-91: Use FMP_REGISTRY for curated endpoint discovery
+    try:
+        from fmpsdk import FMP_REGISTRY
+        # Auto-generate whitelist from registry
+        allowed_functions = frozenset(ep.function for ep in FMP_REGISTRY.values())
+
+        for endpoint_name, endpoint in FMP_REGISTRY.items():
+            func_name = endpoint.function
+
+            # Whitelist validation (defense-in-depth)
+            if func_name not in allowed_functions:
+                logger.warning(f"Function {func_name} not in whitelist, skipping")
+                continue
+
             try:
-                func = getattr(fmpsdk, func_name)
-                if callable(func):
-                    func_info = get_function_signature_and_docs(func)
-                    functions[func_name] = func_info
-                    logger.info(f"Discovered function: {func_name}")
-            except AttributeError:
-                logger.warning(f"Function {func_name} not found in fmpsdk")
+                func = getattr(fmpsdk, func_name, None)
+                if func is None or not callable(func):
+                    logger.warning(f"Function {func_name} not found or not callable")
+                    continue
+
+                # Use registry metadata for better descriptions
+                func_info = {
+                    "parameters": endpoint.parameters,
+                    "description": endpoint.description,
+                    "function": func,
+                }
+                functions[func_name] = func_info
+                logger.info(f"Discovered function: {func_name}")
             except Exception as e:
                 logger.error(f"Error processing function {func_name}: {e}")
-    
+
+    except ImportError:
+        logger.warning("FMP_REGISTRY not available, falling back to __all__")
+        # Fallback to original behavior if registry not available
+        if hasattr(fmpsdk, '__all__'):
+            for func_name in fmpsdk.__all__:
+                try:
+                    func = getattr(fmpsdk, func_name)
+                    if callable(func):
+                        func_info = get_function_signature_and_docs(func)
+                        functions[func_name] = func_info
+                        logger.info(f"Discovered function: {func_name}")
+                except AttributeError:
+                    logger.warning(f"Function {func_name} not found in fmpsdk")
+                except Exception as e:
+                    logger.error(f"Error processing function {func_name}: {e}")
+
     logger.info(f"Discovered {len(functions)} functions from fmpsdk")
     return functions
 

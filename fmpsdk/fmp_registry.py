@@ -24,6 +24,7 @@ class FMPEndpoint:
     """Registry entry for an FMP endpoint.
 
     GEN-92: Parameters are now extracted from function signatures at runtime.
+    GEN-93: Added example field for LLM-friendly function call examples.
     """
 
     name: str  # Canonical name (e.g., "income_statement")
@@ -32,6 +33,7 @@ class FMPEndpoint:
     category: str  # Category for grouping
     example_use_cases: List[str]  # When to use this endpoint
     returns: str  # Description of return data structure
+    example: Optional[str] = None  # Example function call for LLM
     notes: Optional[str] = None  # Any caveats or special handling
 
 
@@ -55,6 +57,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Cost structure analysis",
         ],
         returns="List of income statements with date, revenue, grossProfit, operatingIncome, netIncome, eps, etc.",
+        example="income_statement('AAPL', period='annual', limit=5)",
     ),
     "balance_sheet_statement": FMPEndpoint(
         name="balance_sheet_statement",
@@ -68,6 +71,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Shareholder equity trends",
         ],
         returns="List of balance sheets with totalAssets, totalLiabilities, totalEquity, cash, inventory, etc.",
+        example="balance_sheet_statement('MSFT', period='quarter', limit=8)",
     ),
     "cash_flow_statement": FMPEndpoint(
         name="cash_flow_statement",
@@ -81,6 +85,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Cash conversion analysis",
         ],
         returns="List of cash flow statements with operatingCashFlow, investingCashFlow, financingCashFlow, freeCashFlow, etc.",
+        example="cash_flow_statement('GOOGL', period='annual', limit=5)",
     ),
     "income_statement_as_reported": FMPEndpoint(
         name="income_statement_as_reported",
@@ -93,6 +98,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Audit and compliance checks",
         ],
         returns="As-reported income statement data with original SEC filing field names.",
+        example="income_statement_as_reported('TSLA', period='annual', limit=3)",
     ),
     "balance_sheet_statement_as_reported": FMPEndpoint(
         name="balance_sheet_statement_as_reported",
@@ -104,6 +110,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Company-specific asset/liability categorization",
         ],
         returns="As-reported balance sheet data with original SEC filing field names.",
+        example="balance_sheet_statement_as_reported('AMZN', period='annual', limit=3)",
     ),
     "cash_flow_statement_as_reported": FMPEndpoint(
         name="cash_flow_statement_as_reported",
@@ -115,6 +122,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Company-specific cash flow categorization",
         ],
         returns="As-reported cash flow statement data with original SEC filing field names.",
+        example="cash_flow_statement_as_reported('META', period='annual', limit=3)",
     ),
     "financial_statement_full_as_reported": FMPEndpoint(
         name="financial_statement_full_as_reported",
@@ -126,6 +134,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Full financial picture from original filings",
         ],
         returns="Complete as-reported financial statement data.",
+        example="financial_statement_full_as_reported('NVDA', period='annual')",
     ),
     "earnings_surprises": FMPEndpoint(
         name="earnings_surprises",
@@ -138,6 +147,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Earnings quality evaluation",
         ],
         returns="List of earnings surprises with date, actualEarningResult, estimatedEarning, surprise percentage.",
+        example="earnings_surprises('AAPL', limit=10)",
     ),
     # =========================================================================
     # EARNINGS & TRANSCRIPTS
@@ -154,6 +164,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Competitive intelligence from Q&A",
         ],
         returns="Earnings call transcript text with date, symbol, quarter, year, and content.",
+        example="earning_call_transcript('AAPL', year=2024, quarter=1)",
         notes="Transcripts can be very long (10k+ words). Consider token limits.",
     ),
     "batch_earning_call_transcript": FMPEndpoint(
@@ -167,6 +178,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Annual narrative analysis",
         ],
         returns="Multiple earnings call transcripts for all quarters in the year.",
+        example="batch_earning_call_transcript('MSFT', year=2024)",
         notes="Very large data return - may hit token limits.",
     ),
     "earning_call_transcripts_available_dates": FMPEndpoint(
@@ -179,6 +191,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Plan transcript analysis scope",
         ],
         returns="List of [quarter, year] pairs with available transcripts.",
+        example="earning_call_transcripts_available_dates('GOOGL')",
     ),
     # =========================================================================
     # SEC FILINGS
@@ -194,6 +207,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Identify recent 8-K events",
         ],
         returns="List of filings with type, fillingDate, acceptedDate, cik, link, finalLink.",
+        example="sec_filings('AAPL', filing_type='10-K', limit=5)",
     ),
     "sec_filings_data": FMPEndpoint(
         name="sec_filings_data",
@@ -206,6 +220,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Historical 10-K trend analysis",
         ],
         returns="Full Markdown-formatted SEC filing content.",
+        example="sec_filings_data('TSLA', filing_type='10-K', limit=1)",
         notes="WARNING: Full 10-K content is VERY long (100k+ tokens). Limit to 1-2 filings max.",
     ),
     # =========================================================================
@@ -223,6 +238,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Company description for reports",
         ],
         returns="Company profile with symbol, price, beta, mktCap, description, sector, industry, ceo, website, etc.",
+        example="company_profile('AAPL')",
     ),
     "key_executives": FMPEndpoint(
         name="key_executives",
@@ -235,6 +251,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Corporate governance assessment",
         ],
         returns="List of executives with name, title, pay, currencyPay, etc.",
+        example="key_executives('MSFT')",
     ),
     "company_core_information": FMPEndpoint(
         name="company_core_information",
@@ -246,6 +263,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Company registration details",
         ],
         returns="Core info with cik, exchange, sicCode, sicDescription, stateOfIncorporation, etc.",
+        example="company_core_information('GOOGL')",
     ),
     "company_outlook": FMPEndpoint(
         name="company_outlook",
@@ -257,6 +275,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "All-in-one company analysis",
         ],
         returns="Combined data including profile, metrics, ratios, stock data, insider transactions, and more.",
+        example="company_outlook('AMZN')",
     ),
     "enterprise_values": FMPEndpoint(
         name="enterprise_values",
@@ -269,6 +288,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Capital structure analysis",
         ],
         returns="Enterprise value data with date, symbol, enterpriseValue, numberOfShares, addTotalDebt, minusCashAndEquivalents.",
+        example="enterprise_values('META', period='annual', limit=5)",
     ),
     # =========================================================================
     # KEY METRICS & RATIOS
@@ -284,6 +304,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Leverage and efficiency ratios",
         ],
         returns="Key metrics with revenuePerShare, netIncomePerShare, peRatio, debtToEquity, returnOnEquity, etc.",
+        example="key_metrics('AAPL', period='annual', limit=5)",
     ),
     "key_metrics_ttm": FMPEndpoint(
         name="key_metrics_ttm",
@@ -295,6 +316,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Real-time performance snapshot",
         ],
         returns="TTM key metrics data.",
+        example="key_metrics_ttm('MSFT')",
     ),
     "financial_ratios": FMPEndpoint(
         name="financial_ratios",
@@ -308,6 +330,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Investment screening",
         ],
         returns="Financial ratios including currentRatio, quickRatio, grossProfitMargin, returnOnAssets, debtRatio, etc.",
+        example="financial_ratios('GOOGL', period='annual', limit=5)",
     ),
     "financial_ratios_ttm": FMPEndpoint(
         name="financial_ratios_ttm",
@@ -319,6 +342,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Real-time performance assessment",
         ],
         returns="TTM financial ratios data.",
+        example="financial_ratios_ttm('AMZN')",
     ),
     # =========================================================================
     # GROWTH METRICS
@@ -334,6 +358,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Growth consistency assessment",
         ],
         returns="Growth metrics with revenueGrowth, netIncomeGrowth, epsgrowth, etc.",
+        example="financial_growth('NVDA', period='annual', limit=5)",
     ),
     "income_statement_growth": FMPEndpoint(
         name="income_statement_growth",
@@ -345,6 +370,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Profit margin trend analysis",
         ],
         returns="Income statement growth data.",
+        example="income_statement_growth('TSLA', period='annual', limit=5)",
     ),
     "balance_sheet_statement_growth": FMPEndpoint(
         name="balance_sheet_statement_growth",
@@ -356,6 +382,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Debt growth tracking",
         ],
         returns="Balance sheet growth data.",
+        example="balance_sheet_statement_growth('JPM', period='annual', limit=5)",
     ),
     "cash_flow_statement_growth": FMPEndpoint(
         name="cash_flow_statement_growth",
@@ -367,6 +394,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Free cash flow trend tracking",
         ],
         returns="Cash flow growth data.",
+        example="cash_flow_statement_growth('V', period='annual', limit=5)",
     ),
     # =========================================================================
     # VALUATION
@@ -382,6 +410,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Value investing screening",
         ],
         returns="DCF data with date, symbol, dcf (intrinsic value), stockPrice.",
+        example="discounted_cash_flow('AAPL')",
     ),
     "advanced_discounted_cash_flow": FMPEndpoint(
         name="advanced_discounted_cash_flow",
@@ -393,6 +422,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "DCF sensitivity analysis",
         ],
         returns="Advanced DCF data with detailed projections and assumptions.",
+        example="advanced_discounted_cash_flow('MSFT')",
     ),
     "historical_daily_discounted_cash_flow": FMPEndpoint(
         name="historical_daily_discounted_cash_flow",
@@ -404,6 +434,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Valuation gap analysis over time",
         ],
         returns="Historical DCF values with date, symbol, dcf, stockPrice.",
+        example="historical_daily_discounted_cash_flow('GOOGL', limit=30)",
     ),
     "market_capitalization": FMPEndpoint(
         name="market_capitalization",
@@ -415,6 +446,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Market value assessment",
         ],
         returns="Market cap data with date, symbol, marketCap.",
+        example="market_capitalization('AMZN')",
     ),
     "historical_market_capitalization": FMPEndpoint(
         name="historical_market_capitalization",
@@ -426,6 +458,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Historical size tracking",
         ],
         returns="Historical market cap data.",
+        example="historical_market_capitalization('META', limit=100)",
     ),
     # =========================================================================
     # RATINGS & ANALYSTS
@@ -440,6 +473,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Automated screening based on ratings",
         ],
         returns="Rating data with symbol, date, rating, ratingScore, ratingRecommendation, etc.",
+        example="rating('AAPL')",
     ),
     "historical_rating": FMPEndpoint(
         name="historical_rating",
@@ -451,6 +485,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Historical sentiment tracking",
         ],
         returns="Historical rating data.",
+        example="historical_rating('MSFT', limit=50)",
     ),
     "analyst_estimates": FMPEndpoint(
         name="analyst_estimates",
@@ -463,6 +498,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Consensus estimate tracking",
         ],
         returns="Analyst estimates with estimatedRevenueAvg, estimatedEpsAvg, numberOfAnalysts, etc.",
+        example="analyst_estimates('GOOGL', period='annual', limit=4)",
         notes="Estimates are not always accurate - use for guidance only.",
     ),
     "analyst_recommendation": FMPEndpoint(
@@ -476,6 +512,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Analyst coverage assessment",
         ],
         returns="Analyst recommendations with analystName, analystCompany, recommendationKey, etc.",
+        example="analyst_recommendation('AMZN')",
     ),
     "stock_grade": FMPEndpoint(
         name="stock_grade",
@@ -487,6 +524,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Grade change tracking",
         ],
         returns="Stock grades with gradingCompany, newGrade, previousGrade, action, etc.",
+        example="stock_grade('META', limit=20)",
     ),
     "upgrades_downgrades": FMPEndpoint(
         name="upgrades_downgrades",
@@ -498,6 +536,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Analyst sentiment shifts",
         ],
         returns="Upgrade/downgrade data with publishedDate, newGrade, previousGrade, gradingCompany.",
+        example="upgrades_downgrades('NVDA')",
     ),
     "upgrades_downgrades_consensus": FMPEndpoint(
         name="upgrades_downgrades_consensus",
@@ -509,7 +548,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Consensus view assessment",
         ],
         returns="Consensus data with symbol, strongBuy, buy, hold, sell, strongSell, consensus.",
-    ),
+        example="upgrades_downgrades_consensus('AAPL')",),
     "upgrades_downgrades_by_company": FMPEndpoint(
         name="upgrades_downgrades_by_company",
         function="upgrades_downgrades_by_company",
@@ -520,7 +559,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Firm-level research aggregation",
         ],
         returns="All ratings from the specified analyst firm.",
-    ),
+        example="upgrades_downgrades_by_company()",),
     # =========================================================================
     # PRICE TARGETS
     # =========================================================================
@@ -534,7 +573,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Upside/downside potential assessment",
         ],
         returns="Price targets with analystName, analystCompany, priceTarget, publishedDate.",
-    ),
+        example="price_targets('MSFT')",),
     "price_target_summary": FMPEndpoint(
         name="price_target_summary",
         function="price_target_summary",
@@ -545,7 +584,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Analyst consensus target",
         ],
         returns="Summary with lastMonth, lastQuarter, high, low, average, median, numberOfAnalysts.",
-    ),
+        example="price_target_summary('GOOGL')",),
     "price_target_consensus": FMPEndpoint(
         name="price_target_consensus",
         function="price_target_consensus",
@@ -556,7 +595,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Overall market target",
         ],
         returns="Consensus price target data.",
-    ),
+        example="price_target_consensus('AMZN')",),
     "price_target_by_analyst_name": FMPEndpoint(
         name="price_target_by_analyst_name",
         function="price_target_by_analyst_name",
@@ -567,7 +606,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Analyst performance tracking",
         ],
         returns="Price targets from the specified analyst.",
-    ),
+        example="price_target_by_analyst_name()",),
     "price_target_by_company": FMPEndpoint(
         name="price_target_by_company",
         function="price_target_by_company",
@@ -578,7 +617,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Institutional research tracking",
         ],
         returns="Price targets from the specified firm.",
-    ),
+        example="price_target_by_company()",),
     "price_target_rss_feed": FMPEndpoint(
         name="price_target_rss_feed",
         function="price_target_rss_feed",
@@ -589,7 +628,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Latest analyst actions",
         ],
         returns="Recent price target updates.",
-    ),
+        example="price_target_rss_feed()",),
     # =========================================================================
     # ESG
     # =========================================================================
@@ -605,6 +644,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Renewable energy company assessment",
         ],
         returns="ESG data with environmentalScore, socialScore, governanceScore, ESGScore, etc.",
+        example="esg_score('MSFT')",
     ),
     # =========================================================================
     # COMPANY VALUATION EXTRAS
@@ -620,7 +660,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Industry benchmarking",
         ],
         returns="List of peer symbols.",
-    ),
+        example="stock_peers('NVDA')",),
     "financial_score": FMPEndpoint(
         name="financial_score",
         function="financial_score",
@@ -631,7 +671,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Quick screening metric",
         ],
         returns="Financial score data.",
-    ),
+        example="financial_score('TSLA')",),
     "owner_earnings": FMPEndpoint(
         name="owner_earnings",
         function="owner_earnings",
@@ -642,6 +682,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "True earnings power assessment",
         ],
         returns="Owner earnings data.",
+        example="owner_earnings('BRK-B')",
     ),
     # =========================================================================
     # SEGMENTS
@@ -657,7 +698,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Product line revenue tracking",
         ],
         returns="Revenue by segment with date and segment-specific revenue values.",
-    ),
+        example="sales_revenue_by_segments('V', limit=5)",),
     "revenue_geographic_segmentation": FMPEndpoint(
         name="revenue_geographic_segmentation",
         function="revenue_geographic_segmentation",
@@ -669,7 +710,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Regional performance comparison",
         ],
         returns="Revenue by geography with date and region-specific revenue values.",
-    ),
+        example="revenue_geographic_segmentation('JNJ')",),
     # =========================================================================
     # EMPLOYEE & COMPENSATION
     # =========================================================================
@@ -683,7 +724,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Workforce analysis",
         ],
         returns="Employee count data.",
-    ),
+        example="employee_count('UNH')",),
     "historical_employee_count": FMPEndpoint(
         name="historical_employee_count",
         function="historical_employee_count",
@@ -694,7 +735,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Operational scaling assessment",
         ],
         returns="Historical employee count data.",
-    ),
+        example="historical_employee_count('HD')",),
     "executive_compensation": FMPEndpoint(
         name="executive_compensation",
         function="executive_compensation",
@@ -706,7 +747,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Corporate governance assessment",
         ],
         returns="Executive compensation with name, title, salary, bonus, stockAwards, etc.",
-    ),
+        example="executive_compensation('AAPL')",),
     "compensation_benchmark": FMPEndpoint(
         name="compensation_benchmark",
         function="compensation_benchmark",
@@ -717,7 +758,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Pay benchmarking",
         ],
         returns="Compensation benchmark data.",
-    ),
+        example="compensation_benchmark(2024)",),
     "company_notes": FMPEndpoint(
         name="company_notes",
         function="company_notes",
@@ -728,7 +769,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Notes and observations",
         ],
         returns="Company notes data.",
-    ),
+        example="company_notes('MSFT')",),
     # =========================================================================
     # M&A
     # =========================================================================
@@ -743,7 +784,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Strategic transaction analysis",
         ],
         returns="M&A deal data.",
-    ),
+        example="search_mergers_acquisitions()",),
     "mergers_acquisitions_rss_feed": FMPEndpoint(
         name="mergers_acquisitions_rss_feed",
         function="mergers_acquisitions_rss_feed",
@@ -754,7 +795,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Deal flow tracking",
         ],
         returns="Latest M&A news.",
-    ),
+        example="mergers_acquisitions_rss_feed()",),
     # =========================================================================
     # NEWS
     # =========================================================================
@@ -769,7 +810,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Sentiment research",
         ],
         returns="News articles with title, publishedDate, site, url, text snippet.",
-    ),
+        example="stock_news()",),
     "general_news": FMPEndpoint(
         name="general_news",
         function="general_news",
@@ -780,7 +821,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "General financial coverage",
         ],
         returns="General news articles.",
-    ),
+        example="general_news()",),
     "fmp_articles": FMPEndpoint(
         name="fmp_articles",
         function="fmp_articles",
@@ -791,7 +832,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Educational content",
         ],
         returns="FMP articles with title, date, content.",
-    ),
+        example="fmp_articles()",),
     "press_releases": FMPEndpoint(
         name="press_releases",
         function="press_releases",
@@ -803,7 +844,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Event detection",
         ],
         returns="Press releases with title, date, text.",
-    ),
+        example="press_releases()",),
     "upgrades_downgrades_rss_feed": FMPEndpoint(
         name="upgrades_downgrades_rss_feed",
         function="upgrades_downgrades_rss_feed",
@@ -814,7 +855,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Analyst action monitoring",
         ],
         returns="Latest upgrades/downgrades.",
-    ),
+        example="upgrades_downgrades_rss_feed()",),
     # =========================================================================
     # CALENDAR
     # =========================================================================
@@ -829,7 +870,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Event planning",
         ],
         returns="Earnings calendar with date, symbol, eps, epsEstimated, revenue, revenueEstimated.",
-    ),
+        example="earning_calendar()",),
     "historical_earning_calendar": FMPEndpoint(
         name="historical_earning_calendar",
         function="historical_earning_calendar",
@@ -840,7 +881,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Earnings pattern analysis",
         ],
         returns="Historical earnings calendar data.",
-    ),
+        example="historical_earning_calendar('GOOGL', limit=5)",),
     "dividend_calendar": FMPEndpoint(
         name="dividend_calendar",
         function="dividend_calendar",
@@ -851,6 +892,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Ex-dividend date tracking",
         ],
         returns="Dividend calendar with date, symbol, dividend, recordDate, paymentDate.",
+        example="dividend_calendar()",
         notes="Maximum 3-month date range.",
     ),
     "ipo_calendar": FMPEndpoint(
@@ -863,7 +905,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "New listing research",
         ],
         returns="IPO calendar with date, symbol, exchange, name, ipoPrice, priceRange.",
-    ),
+        example="ipo_calendar()",),
     "stock_split_calendar": FMPEndpoint(
         name="stock_split_calendar",
         function="stock_split_calendar",
@@ -874,7 +916,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Corporate action monitoring",
         ],
         returns="Stock split calendar with date, symbol, numerator, denominator.",
-    ),
+        example="stock_split_calendar()",),
     "economic_calendar": FMPEndpoint(
         name="economic_calendar",
         function="economic_calendar",
@@ -886,7 +928,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Market-moving event planning",
         ],
         returns="Economic calendar with date, event, country, actual, previous, estimate, impact.",
-    ),
+        example="economic_calendar()",),
     # =========================================================================
     # QUOTES & MARKET DATA
     # =========================================================================
@@ -901,7 +943,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Trading decisions",
         ],
         returns="Full quote with price, change, changesPercentage, dayLow, dayHigh, volume, avgVolume, etc.",
-    ),
+        example="quote('AMZN')",),
     "quote_short": FMPEndpoint(
         name="quote_short",
         function="quote_short",
@@ -912,7 +954,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Simple market snapshot",
         ],
         returns="Short quote with symbol, price, volume.",
-    ),
+        example="quote_short('META')",),
     "historical_price_full": FMPEndpoint(
         name="historical_price_full",
         function="historical_price_full",
@@ -925,7 +967,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Chart data",
         ],
         returns="Historical prices with date, open, high, low, close, volume, change, changePercent.",
-    ),
+        example="historical_price_full('NVDA')",),
     "historical_chart": FMPEndpoint(
         name="historical_chart",
         function="historical_chart",
@@ -937,7 +979,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Technical analysis",
         ],
         returns="Historical chart data with date, open, high, low, close, volume.",
-    ),
+        example="historical_chart('TSLA', '1day', from_date='2024-01-01', to_date='2024-03-31')",),
     "multiple_company_prices": FMPEndpoint(
         name="multiple_company_prices",
         function="multiple_company_prices",
@@ -949,7 +991,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Watchlist updates",
         ],
         returns="Prices for multiple symbols.",
-    ),
+        example="multiple_company_prices('JPM')",),
     # =========================================================================
     # MARKET MOVERS
     # =========================================================================
@@ -964,7 +1006,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Liquidity analysis",
         ],
         returns="Active stocks with symbol, name, change, price, changesPercentage, volume.",
-    ),
+        example="actives()",),
     "gainers": FMPEndpoint(
         name="gainers",
         function="gainers",
@@ -975,7 +1017,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Momentum stock discovery",
         ],
         returns="Top gaining stocks with symbol, name, change, price, changesPercentage.",
-    ),
+        example="gainers()",),
     "losers": FMPEndpoint(
         name="losers",
         function="losers",
@@ -987,7 +1029,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Potential recovery plays",
         ],
         returns="Top losing stocks with symbol, name, change, price, changesPercentage.",
-    ),
+        example="losers()",),
     "sectors_performance": FMPEndpoint(
         name="sectors_performance",
         function="sectors_performance",
@@ -998,7 +1040,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Market breadth assessment",
         ],
         returns="Sector performance with sector name and changesPercentage.",
-    ),
+        example="sectors_performance()",),
     "historical_sectors_performance": FMPEndpoint(
         name="historical_sectors_performance",
         function="historical_sectors_performance",
@@ -1009,7 +1051,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Historical rotation patterns",
         ],
         returns="Historical sector performance data.",
-    ),
+        example="historical_sectors_performance(from_date='2024-01-01', to_date='2024-03-31')",),
     "market_hours": FMPEndpoint(
         name="market_hours",
         function="market_hours",
@@ -1020,7 +1062,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Market timing",
         ],
         returns="Market hours data.",
-    ),
+        example="market_hours()",),
     "is_market_open": FMPEndpoint(
         name="is_market_open",
         function="is_market_open",
@@ -1031,7 +1073,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Trading availability",
         ],
         returns="Market open/closed status.",
-    ),
+        example="is_market_open()",),
     # =========================================================================
     # INDEXES
     # =========================================================================
@@ -1045,6 +1087,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Index performance comparison",
         ],
         returns="Index data with symbol, name, price, change, changesPercentage.",
+        example="indexes()",
     ),
     "sp500_constituent": FMPEndpoint(
         name="sp500_constituent",
@@ -1056,7 +1099,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Index composition analysis",
         ],
         returns="S&P 500 constituents with symbol, name, sector, subSector.",
-    ),
+        example="sp500_constituent()",),
     "historical_sp500_constituent": FMPEndpoint(
         name="historical_sp500_constituent",
         function="historical_sp500_constituent",
@@ -1067,7 +1110,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Historical composition",
         ],
         returns="Historical S&P 500 changes.",
-    ),
+        example="historical_sp500_constituent()",),
     "nasdaq_constituent": FMPEndpoint(
         name="nasdaq_constituent",
         function="nasdaq_constituent",
@@ -1078,7 +1121,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Tech index composition",
         ],
         returns="NASDAQ constituents with symbol, name, sector.",
-    ),
+        example="nasdaq_constituent()",),
     "historical_nasdaq_constituent": FMPEndpoint(
         name="historical_nasdaq_constituent",
         function="historical_nasdaq_constituent",
@@ -1088,7 +1131,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "NASDAQ changes tracking",
         ],
         returns="Historical NASDAQ changes.",
-    ),
+        example="historical_nasdaq_constituent()",),
     "dowjones_constituent": FMPEndpoint(
         name="dowjones_constituent",
         function="dowjones_constituent",
@@ -1099,7 +1142,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Blue chip analysis",
         ],
         returns="Dow Jones constituents.",
-    ),
+        example="dowjones_constituent()",),
     "historical_dowjones_constituent": FMPEndpoint(
         name="historical_dowjones_constituent",
         function="historical_dowjones_constituent",
@@ -1109,7 +1152,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "DJIA changes tracking",
         ],
         returns="Historical Dow Jones changes.",
-    ),
+        example="historical_dowjones_constituent()",),
     # =========================================================================
     # INSTITUTIONAL & OWNERSHIP
     # =========================================================================
@@ -1124,7 +1167,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Ownership concentration",
         ],
         returns="Institutional holders with holder name, shares, dateReported, change, changePercentage.",
-    ),
+        example="institutional_holders('V')",),
     "mutual_fund_holders": FMPEndpoint(
         name="mutual_fund_holders",
         function="mutual_fund_holders",
@@ -1135,7 +1178,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Fund flow analysis",
         ],
         returns="Mutual fund holders data.",
-    ),
+        example="mutual_fund_holders('JNJ')",),
     "etf_holders": FMPEndpoint(
         name="etf_holders",
         function="etf_holders",
@@ -1146,7 +1189,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Passive ownership tracking",
         ],
         returns="ETF holders data.",
-    ),
+        example="etf_holders('UNH')",),
     "form_13f": FMPEndpoint(
         name="form_13f",
         function="form_13f",
@@ -1157,7 +1200,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Hedge fund tracking",
         ],
         returns="13F holdings with cusip, symbol, shares, value.",
-    ),
+        example="form_13f('0000320193')",),
     # =========================================================================
     # ETF DATA
     # =========================================================================
@@ -1171,7 +1214,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Portfolio diversification assessment",
         ],
         returns="Sector weightings with sector and weightPercentage.",
-    ),
+        example="etf_sector_weightings('HD')",),
     "etf_country_weightings": FMPEndpoint(
         name="etf_country_weightings",
         function="etf_country_weightings",
@@ -1182,7 +1225,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "International diversification",
         ],
         returns="Country weightings data.",
-    ),
+        example="etf_country_weightings('AAPL')",),
     # =========================================================================
     # INSIDER TRADING
     # =========================================================================
@@ -1198,6 +1241,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         ],
         returns="Insider trades with reportingName, transactionType, securitiesTransacted, price.",
         notes="Provide only ONE of: symbol, reporting_cik, or company_cik.",
+        example="insider_trading(symbol='AAPL', limit=20)",
     ),
     "insider_trading_rss_feed": FMPEndpoint(
         name="insider_trading_rss_feed",
@@ -1209,7 +1253,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Breaking insider trades",
         ],
         returns="Latest insider trades.",
-    ),
+        example="insider_trading_rss_feed()",),
     # =========================================================================
     # SENATE TRADING
     # =========================================================================
@@ -1223,7 +1267,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Political insider trading",
         ],
         returns="Senate trading data.",
-    ),
+        example="senate_trading_rss()",),
     "senate_trading_symbol": FMPEndpoint(
         name="senate_trading_symbol",
         function="senate_trading_symbol",
@@ -1233,7 +1277,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Congressional trades in specific stocks",
         ],
         returns="Senate trades for the symbol.",
-    ),
+        example="senate_trading_symbol('MSFT')",),
     "senate_disclosure_rss": FMPEndpoint(
         name="senate_disclosure_rss",
         function="senate_disclosure_rss",
@@ -1243,7 +1287,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Senate disclosure monitoring",
         ],
         returns="Senate disclosure data.",
-    ),
+        example="senate_disclosure_rss()",),
     "senate_disclosure_symbol": FMPEndpoint(
         name="senate_disclosure_symbol",
         function="senate_disclosure_symbol",
@@ -1253,7 +1297,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Senate holdings in specific stocks",
         ],
         returns="Senate disclosures for the symbol.",
-    ),
+        example="senate_disclosure_symbol('GOOGL')",),
     # =========================================================================
     # DIVIDENDS & SPLITS
     # =========================================================================
@@ -1268,7 +1312,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Income investing research",
         ],
         returns="Historical dividends with date, label, adjDividend, dividend.",
-    ),
+        example="historical_stock_dividend('AMZN')",),
     "historical_stock_split": FMPEndpoint(
         name="historical_stock_split",
         function="historical_stock_split",
@@ -1279,7 +1323,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Price adjustment research",
         ],
         returns="Historical splits with date, label, numerator, denominator.",
-    ),
+        example="historical_stock_split('META')",),
     # =========================================================================
     # SHARES FLOAT
     # =========================================================================
@@ -1294,7 +1338,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Liquidity assessment",
         ],
         returns="Shares float with symbol, date, freeFloat, floatShares, outstandingShares.",
-    ),
+        example="shares_float('NVDA')",),
     "historical_share_float": FMPEndpoint(
         name="historical_share_float",
         function="historical_share_float",
@@ -1305,7 +1349,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Dilution tracking",
         ],
         returns="Historical float data.",
-    ),
+        example="historical_share_float('TSLA')",),
     # =========================================================================
     # SOCIAL SENTIMENT
     # =========================================================================
@@ -1319,7 +1363,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Retail investor sentiment",
         ],
         returns="Social sentiment data with date and sentiment metrics.",
-    ),
+        example="historical_social_sentiment('JPM')",),
     "trending_social_sentiment": FMPEndpoint(
         name="trending_social_sentiment",
         function="trending_social_sentiment",
@@ -1330,7 +1374,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Social momentum tracking",
         ],
         returns="Trending stocks by sentiment.",
-    ),
+        example="trending_social_sentiment()",),
     "social_sentiment_changes": FMPEndpoint(
         name="social_sentiment_changes",
         function="social_sentiment_changes",
@@ -1341,7 +1385,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Momentum changes",
         ],
         returns="Sentiment change data.",
-    ),
+        example="social_sentiment_changes()",),
     # =========================================================================
     # TECHNICAL INDICATORS
     # =========================================================================
@@ -1356,6 +1400,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Trend identification",
         ],
         returns="Technical indicator values with date and indicator value.",
+        example="technical_indicators('AAPL', period=14, statistics_type='rsi')",
     ),
     # =========================================================================
     # ECONOMICS
@@ -1371,7 +1416,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Risk-free rate lookup",
         ],
         returns="Treasury rates with date and rates for various maturities.",
-    ),
+        example="treasury_rates()",),
     "economic_indicators": FMPEndpoint(
         name="economic_indicators",
         function="economic_indicators",
@@ -1383,6 +1428,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Inflation monitoring",
         ],
         returns="Economic indicator values with date and value.",
+        example="economic_indicators('GDP')",
     ),
     "market_risk_premium": FMPEndpoint(
         name="market_risk_premium",
@@ -1394,7 +1440,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Cost of equity estimation",
         ],
         returns="Market risk premium data.",
-    ),
+        example="market_risk_premium()",),
     # =========================================================================
     # FOREX
     # =========================================================================
@@ -1408,7 +1454,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "FX market overview",
         ],
         returns="Forex prices with ticker, bid, ask, changes.",
-    ),
+        example="forex()",),
     "forex_list": FMPEndpoint(
         name="forex_list",
         function="forex_list",
@@ -1418,7 +1464,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Complete FX market data",
         ],
         returns="Full forex quotes.",
-    ),
+        example="forex_list()",),
     "forex_quote": FMPEndpoint(
         name="forex_quote",
         function="forex_quote",
@@ -1428,7 +1474,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Specific currency pair quote",
         ],
         returns="Forex quote data.",
-    ),
+        example="forex_quote('JNJ')",),
     "forex_historical": FMPEndpoint(
         name="forex_historical",
         function="forex_historical",
@@ -1439,7 +1485,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Currency trend research",
         ],
         returns="Historical forex prices.",
-    ),
+        example="forex_historical('UNH', from_date='2024-01-01', to_date='2024-03-31')",),
     # =========================================================================
     # CRYPTO
     # =========================================================================
@@ -1453,7 +1499,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Bitcoin/Ethereum quotes",
         ],
         returns="Cryptocurrency quote data.",
-    ),
+        example="cryptocurrency_quote('HD')",),
     "cryptocurrencies_list": FMPEndpoint(
         name="cryptocurrencies_list",
         function="cryptocurrencies_list",
@@ -1463,7 +1509,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Full crypto market overview",
         ],
         returns="All cryptocurrency quotes.",
-    ),
+        example="cryptocurrencies_list()",),
     # =========================================================================
     # COMMODITIES
     # =========================================================================
@@ -1477,7 +1523,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Gold/oil/silver prices",
         ],
         returns="Commodity price data.",
-    ),
+        example="commodity_price('AAPL')",),
     "commodities_list": FMPEndpoint(
         name="commodities_list",
         function="commodities_list",
@@ -1487,7 +1533,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Commodities market overview",
         ],
         returns="All commodity quotes.",
-    ),
+        example="commodities_list()",),
     # =========================================================================
     # STOCK SCREENER
     # =========================================================================
@@ -1502,6 +1548,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Sector-specific searches",
         ],
         returns="Screened stocks with symbol, companyName, marketCap, sector, etc.",
+        example="stock_screener(market_cap_more_than=1e9, sector='Technology', limit=10)",
     ),
     # =========================================================================
     # SEARCH
@@ -1516,7 +1563,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Ticker lookup",
         ],
         returns="Search results with symbol, name, currency, stockExchange.",
-    ),
+        example="search()",),
     "search_ticker": FMPEndpoint(
         name="search_ticker",
         function="search_ticker",
@@ -1526,7 +1573,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Ticker symbol lookup",
         ],
         returns="Ticker search results.",
-    ),
+        example="search_ticker()",),
     # =========================================================================
     # REFERENCE DATA
     # =========================================================================
@@ -1539,7 +1586,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Complete stock universe",
         ],
         returns="All stock symbols.",
-    ),
+        example="symbols_list()",),
     "etf_list": FMPEndpoint(
         name="etf_list",
         function="etf_list",
@@ -1549,7 +1596,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "ETF universe",
         ],
         returns="All ETF symbols.",
-    ),
+        example="etf_list()",),
     "available_traded_list": FMPEndpoint(
         name="available_traded_list",
         function="available_traded_list",
@@ -1559,7 +1606,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Tradable securities list",
         ],
         returns="All tradable symbols.",
-    ),
+        example="available_traded_list()",),
     "available_forex": FMPEndpoint(
         name="available_forex",
         function="available_forex",
@@ -1569,7 +1616,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "FX pair availability",
         ],
         returns="Available forex pairs.",
-    ),
+        example="available_forex()",),
     "available_cryptocurrencies": FMPEndpoint(
         name="available_cryptocurrencies",
         function="available_cryptocurrencies",
@@ -1579,7 +1626,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Crypto availability",
         ],
         returns="Available cryptocurrencies.",
-    ),
+        example="available_cryptocurrencies()",),
     "available_commodities": FMPEndpoint(
         name="available_commodities",
         function="available_commodities",
@@ -1589,7 +1636,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Commodity availability",
         ],
         returns="Available commodities.",
-    ),
+        example="available_commodities()",),
     "available_etfs": FMPEndpoint(
         name="available_etfs",
         function="available_etfs",
@@ -1599,7 +1646,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "ETF availability",
         ],
         returns="Available ETFs.",
-    ),
+        example="available_etfs()",),
     "available_indexes": FMPEndpoint(
         name="available_indexes",
         function="available_indexes",
@@ -1609,7 +1656,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Index availability",
         ],
         returns="Available indexes.",
-    ),
+        example="available_indexes()",),
     "available_sectors": FMPEndpoint(
         name="available_sectors",
         function="available_sectors",
@@ -1619,7 +1666,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Sector list for screening",
         ],
         returns="Available sectors.",
-    ),
+        example="available_sectors()",),
     "available_industries": FMPEndpoint(
         name="available_industries",
         function="available_industries",
@@ -1629,7 +1676,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Industry list for screening",
         ],
         returns="Available industries.",
-    ),
+        example="available_industries()",),
     "available_exchanges": FMPEndpoint(
         name="available_exchanges",
         function="available_exchanges",
@@ -1639,7 +1686,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Exchange list",
         ],
         returns="Available exchanges.",
-    ),
+        example="available_exchanges()",),
     "all_countries": FMPEndpoint(
         name="all_countries",
         function="all_countries",
@@ -1649,7 +1696,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Country availability",
         ],
         returns="All countries.",
-    ),
+        example="all_countries()",),
     "delisted_companies": FMPEndpoint(
         name="delisted_companies",
         function="delisted_companies",
@@ -1659,7 +1706,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Historical delisting tracking",
         ],
         returns="Delisted companies.",
-    ),
+        example="delisted_companies()",),
     "financial_statement_symbol_lists": FMPEndpoint(
         name="financial_statement_symbol_lists",
         function="financial_statement_symbol_lists",
@@ -1669,7 +1716,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Find companies with financials",
         ],
         returns="Symbols with financial statements.",
-    ),
+        example="financial_statement_symbol_lists()",),
     # =========================================================================
     # CIK MAPPING
     # =========================================================================
@@ -1682,7 +1729,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "CIK to company lookup",
         ],
         returns="Company name for CIK.",
-    ),
+        example="cik('0000320193')",),
     "cik_list": FMPEndpoint(
         name="cik_list",
         function="cik_list",
@@ -1692,7 +1739,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "CIK database",
         ],
         returns="CIK list.",
-    ),
+        example="cik_list()",),
     "cik_search": FMPEndpoint(
         name="cik_search",
         function="cik_search",
@@ -1702,7 +1749,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Find CIK by name",
         ],
         returns="CIK search results.",
-    ),
+        example="cik_search()",),
     "cusip": FMPEndpoint(
         name="cusip",
         function="cusip",
@@ -1712,7 +1759,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "CUSIP lookup",
         ],
         returns="CUSIP data.",
-    ),
+        example="cusip('0000320193')",),
     "mapper_cik_name": FMPEndpoint(
         name="mapper_cik_name",
         function="mapper_cik_name",
@@ -1722,7 +1769,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Find CIK for insider",
         ],
         returns="CIK mapping.",
-    ),
+        example="mapper_cik_name()",),
     "mapper_cik_company": FMPEndpoint(
         name="mapper_cik_company",
         function="mapper_cik_company",
@@ -1732,7 +1779,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Find CIK for ticker",
         ],
         returns="Company CIK.",
-    ),
+        example="mapper_cik_company()",),
     # =========================================================================
     # ALTERNATIVE DATA
     # =========================================================================
@@ -1745,7 +1792,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "COT report availability",
         ],
         returns="COT symbols.",
-    ),
+        example="commitment_of_traders_report_list()",),
     "commitment_of_traders_report": FMPEndpoint(
         name="commitment_of_traders_report",
         function="commitment_of_traders_report",
@@ -1756,7 +1803,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Speculator vs hedger activity",
         ],
         returns="COT report data.",
-    ),
+        example="commitment_of_traders_report('MSFT')",),
     "commitment_of_traders_report_analysis": FMPEndpoint(
         name="commitment_of_traders_report_analysis",
         function="commitment_of_traders_report_analysis",
@@ -1766,7 +1813,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "COT trend analysis",
         ],
         returns="COT analysis data.",
-    ),
+        example="commitment_of_traders_report_analysis('GOOGL', from_date='2024-01-01', to_date='2024-03-31')",),
     "fail_to_deliver": FMPEndpoint(
         name="fail_to_deliver",
         function="fail_to_deliver",
@@ -1777,7 +1824,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Settlement issues tracking",
         ],
         returns="FTD data.",
-    ),
+        example="fail_to_deliver('AMZN')",),
     "sector_pe_ratio": FMPEndpoint(
         name="sector_pe_ratio",
         function="sector_pe_ratio",
@@ -1787,7 +1834,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Sector valuation comparison",
         ],
         returns="Sector PE ratios.",
-    ),
+        example="sector_pe_ratio('2024-01-01')",),
     "industry_pe_ratio": FMPEndpoint(
         name="industry_pe_ratio",
         function="industry_pe_ratio",
@@ -1797,7 +1844,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Industry valuation comparison",
         ],
         returns="Industry PE ratios.",
-    ),
+        example="industry_pe_ratio('2024-01-01')",),
     "batch_eod_prices": FMPEndpoint(
         name="batch_eod_prices",
         function="batch_eod_prices",
@@ -1808,7 +1855,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Bulk price data",
         ],
         returns="All EOD prices for the date.",
-    ),
+        example="batch_eod_prices('2024-01-01')",),
     "sec_rss_feeds": FMPEndpoint(
         name="sec_rss_feeds",
         function="sec_rss_feeds",
@@ -1819,7 +1866,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Real-time filing monitoring",
         ],
         returns="Latest SEC filings.",
-    ),
+        example="sec_rss_feeds()",),
     "exchange_realtime": FMPEndpoint(
         name="exchange_realtime",
         function="exchange_realtime",
@@ -1829,7 +1876,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Exchange-wide real-time data",
         ],
         returns="Real-time quotes for exchange.",
-    ),
+        example="exchange_realtime('NYSE')",),
     # =========================================================================
     # CROWDFUNDING
     # =========================================================================
@@ -1842,7 +1889,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Crowdfunding monitoring",
         ],
         returns="Crowdfunding campaigns.",
-    ),
+        example="crowdfunding_rss_feed()",),
     "crowdfunding_search": FMPEndpoint(
         name="crowdfunding_search",
         function="crowdfunding_search",
@@ -1852,7 +1899,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Find specific crowdfunding campaigns",
         ],
         returns="Matching crowdfunding campaigns.",
-    ),
+        example="crowdfunding_search()",),
     "crowdfunding_by_cik": FMPEndpoint(
         name="crowdfunding_by_cik",
         function="crowdfunding_by_cik",
@@ -1862,7 +1909,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Company-specific crowdfunding",
         ],
         returns="Crowdfunding campaigns for CIK.",
-    ),
+        example="crowdfunding_by_cik('0000320193')",),
     # Additional reference data
     "available_mutual_funds": FMPEndpoint(
         name="available_mutual_funds",
@@ -1871,7 +1918,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         category="reference",
         example_use_cases=["Mutual fund availability"],
         returns="Available mutual funds.",
-    ),
+        example="available_mutual_funds()",),
     "available_tsx": FMPEndpoint(
         name="available_tsx",
         function="available_tsx",
@@ -1879,7 +1926,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         category="reference",
         example_use_cases=["TSX availability"],
         returns="Available TSX symbols.",
-    ),
+        example="available_tsx()",),
     "available_euronext": FMPEndpoint(
         name="available_euronext",
         function="available_euronext",
@@ -1887,7 +1934,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         category="reference",
         example_use_cases=["Euronext availability"],
         returns="Available Euronext stocks.",
-    ),
+        example="available_euronext()",),
     "mutual_fund_list": FMPEndpoint(
         name="mutual_fund_list",
         function="mutual_fund_list",
@@ -1895,7 +1942,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         category="market",
         example_use_cases=["Mutual fund quotes"],
         returns="All mutual fund quotes.",
-    ),
+        example="mutual_fund_list()",),
     "tsx_list": FMPEndpoint(
         name="tsx_list",
         function="tsx_list",
@@ -1903,7 +1950,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
         category="market",
         example_use_cases=["TSX market data"],
         returns="TSX stocks data.",
-    ),
+        example="tsx_list()",),
     # =========================================================================
     # NEW STABLE API ENDPOINTS
     # =========================================================================
@@ -1918,6 +1965,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Most recent financial performance snapshot",
         ],
         returns="TTM income statement with revenue, expenses, netIncome, etc.",
+        example="income_statement_ttm('NVDA')",
     ),
     "balance_sheet_statement_ttm": FMPEndpoint(
         name="balance_sheet_statement_ttm",
@@ -1930,7 +1978,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Real-time financial health check",
         ],
         returns="Current balance sheet with totalAssets, totalLiabilities, totalEquity, etc.",
-    ),
+        example="balance_sheet_statement_ttm('NVDA')",),
     "cash_flow_statement_ttm": FMPEndpoint(
         name="cash_flow_statement_ttm",
         function="cash_flow_statement_ttm",
@@ -1942,6 +1990,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Capital expenditure assessment",
         ],
         returns="TTM cash flow statement with operatingCashFlow, investingCashFlow, financingCashFlow, etc.",
+        example="cash_flow_statement_ttm('NVDA')",
     ),
     "latest_financial_statements": FMPEndpoint(
         name="latest_financial_statements",
@@ -1954,7 +2003,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Find companies with fresh financial data",
         ],
         returns="List of recently filed financial statements with company info and filing dates.",
-    ),
+        example="latest_financial_statements()",),
     "earning_call_transcript_latest": FMPEndpoint(
         name="earning_call_transcript_latest",
         function="earning_call_transcript_latest",
@@ -1966,6 +2015,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Current quarter executive discussions",
         ],
         returns="Latest earnings call transcript with content and metadata.",
+        example="earning_call_transcript_latest('JPM')",
         notes="Transcripts can be very long (10k+ words). Consider token limits when processing.",
     ),
     "ratings_snapshot": FMPEndpoint(
@@ -1979,7 +2029,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Market consensus assessment",
         ],
         returns="Rating distribution with strong buy, buy, hold, sell, strong sell counts.",
-    ),
+        example="ratings_snapshot('V')",),
     "grades_consensus": FMPEndpoint(
         name="grades_consensus",
         function="grades_consensus",
@@ -1991,7 +2041,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Quick recommendation lookup",
         ],
         returns="Consensus grade with overall recommendation and scores.",
-    ),
+        example="grades_consensus('JNJ')",),
     "aftermarket_trade": FMPEndpoint(
         name="aftermarket_trade",
         function="aftermarket_trade",
@@ -2003,7 +2053,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Assess overnight market reactions",
         ],
         returns="After-hours trade data with price, volume, timestamp.",
-    ),
+        example="aftermarket_trade('UNH')",),
     "aftermarket_quote": FMPEndpoint(
         name="aftermarket_quote",
         function="aftermarket_quote",
@@ -2015,7 +2065,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Pre-market pricing assessment",
         ],
         returns="After-hours quote with bid, ask, and related pricing data.",
-    ),
+        example="aftermarket_quote('HD')",),
     "industry_performance_snapshot": FMPEndpoint(
         name="industry_performance_snapshot",
         function="industry_performance_snapshot",
@@ -2027,7 +2077,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Market rotation analysis",
         ],
         returns="Performance data for each industry with change percentages.",
-    ),
+        example="industry_performance_snapshot()",),
     "holidays_by_exchange": FMPEndpoint(
         name="holidays_by_exchange",
         function="holidays_by_exchange",
@@ -2039,7 +2089,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Holiday schedule lookup",
         ],
         returns="List of holiday dates with names for the exchange.",
-    ),
+        example="holidays_by_exchange('NYSE')",),
 }
 
 
@@ -2155,20 +2205,9 @@ def get_registry_for_llm(
             lines.append(f"**Function:** `fmpsdk.{ep.function}()`")
             lines.append(f"**Description:** {ep.description}")
 
-            # Parameters
-            if include_parameters and ep.parameters:
-                params_str = []
-                for param, details in ep.parameters.items():
-                    if isinstance(details, dict):
-                        req = "required" if details.get("required") else "optional"
-                        default = f", default={details.get('default')}" if "default" in details else ""
-                        options = f", options={details.get('options')}" if "options" in details else ""
-                        params_str.append(f"  - `{param}` ({details.get('type', 'any')}, {req}{default}{options})")
-                    else:
-                        params_str.append(f"  - `{param}`: {details}")
-                if params_str:
-                    lines.append("**Parameters:**")
-                    lines.extend(params_str)
+            # GEN-93: Show example instead of parameters (parameters removed in GEN-92)
+            if include_parameters and ep.example:
+                lines.append(f"**Example:** `{ep.example}`")
 
             # Use cases
             if include_use_cases and ep.example_use_cases:
@@ -2208,8 +2247,11 @@ def get_compact_registry_for_llm() -> str:
 
         lines.append(f"## {cat.upper()}: {desc}")
         for ep in endpoints:
-            params = ", ".join(ep.parameters.keys()) if ep.parameters else "none"
-            lines.append(f"- **{ep.name}**({params}): {ep.description[:100]}...")
+            # GEN-93: Use example if available, otherwise just function name
+            if ep.example:
+                lines.append(f"- **{ep.name}**: {ep.description[:80]}... Example: `{ep.example}`")
+            else:
+                lines.append(f"- **{ep.name}**: {ep.description[:100]}...")
         lines.append("")
 
     return "\n".join(lines)

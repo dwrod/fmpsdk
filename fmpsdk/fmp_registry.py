@@ -370,7 +370,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Profit margin trend analysis",
         ],
         returns="Income statement growth data.",
-        example="income_statement_growth('TSLA', period='annual', limit=5)",
+        example="income_statement_growth('TSLA', limit=5)",
     ),
     "balance_sheet_statement_growth": FMPEndpoint(
         name="balance_sheet_statement_growth",
@@ -382,7 +382,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Debt growth tracking",
         ],
         returns="Balance sheet growth data.",
-        example="balance_sheet_statement_growth('JPM', period='annual', limit=5)",
+        example="balance_sheet_statement_growth('JPM', limit=5)",
     ),
     "cash_flow_statement_growth": FMPEndpoint(
         name="cash_flow_statement_growth",
@@ -394,7 +394,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Free cash flow trend tracking",
         ],
         returns="Cash flow growth data.",
-        example="cash_flow_statement_growth('V', period='annual', limit=5)",
+        example="cash_flow_statement_growth('V', limit=5)",
     ),
     # =========================================================================
     # VALUATION

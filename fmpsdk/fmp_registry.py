@@ -147,7 +147,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Earnings quality evaluation",
         ],
         returns="List of earnings surprises with date, actualEarningResult, estimatedEarning, surprise percentage.",
-        example="earnings_surprises('AAPL', limit=10)",
+        example="earnings_surprises('AAPL')",
     ),
     # =========================================================================
     # EARNINGS & TRANSCRIPTS
@@ -1214,7 +1214,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Portfolio diversification assessment",
         ],
         returns="Sector weightings with sector and weightPercentage.",
-        example="etf_sector_weightings('HD')",),
+        example="etf_sector_weightings('SPY')",),
     "etf_country_weightings": FMPEndpoint(
         name="etf_country_weightings",
         function="etf_country_weightings",
@@ -1225,7 +1225,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "International diversification",
         ],
         returns="Country weightings data.",
-        example="etf_country_weightings('AAPL')",),
+        example="etf_country_weightings('VEU')",),
     # =========================================================================
     # INSIDER TRADING
     # =========================================================================
@@ -1474,7 +1474,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Specific currency pair quote",
         ],
         returns="Forex quote data.",
-        example="forex_quote('JNJ')",),
+        example="forex_quote('EURUSD')",),
     "forex_historical": FMPEndpoint(
         name="forex_historical",
         function="forex_historical",
@@ -1485,7 +1485,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Currency trend research",
         ],
         returns="Historical forex prices.",
-        example="forex_historical('UNH', from_date='2024-01-01', to_date='2024-03-31')",),
+        example="forex_historical('EURUSD', from_date='2024-01-01', to_date='2024-03-31')",),
     # =========================================================================
     # CRYPTO
     # =========================================================================
@@ -1499,7 +1499,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Bitcoin/Ethereum quotes",
         ],
         returns="Cryptocurrency quote data.",
-        example="cryptocurrency_quote('HD')",),
+        example="cryptocurrency_quote('BTCUSD')",),
     "cryptocurrencies_list": FMPEndpoint(
         name="cryptocurrencies_list",
         function="cryptocurrencies_list",
@@ -1523,7 +1523,7 @@ FMP_REGISTRY: Dict[str, FMPEndpoint] = {
             "Gold/oil/silver prices",
         ],
         returns="Commodity price data.",
-        example="commodity_price('AAPL')",),
+        example="commodity_price('ZGUSD', from_date='2024-01-01', to_date='2024-03-31')",),
     "commodities_list": FMPEndpoint(
         name="commodities_list",
         function="commodities_list",

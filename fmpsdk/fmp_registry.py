@@ -2332,3 +2332,133 @@ def search_endpoints(query: str) -> List[FMPEndpoint]:
             results.append(ep)
 
     return results
+
+
+# =============================================================================
+# GEN-127: FIELD INVENTORY ACCESSORS
+# =============================================================================
+
+
+def get_endpoint_fields(endpoint_name: str) -> List[str]:
+    """
+    Get exact field names returned by an FMP endpoint.
+
+    GEN-127: This function provides deterministic field listings generated via
+    API introspection, enabling the schema planning LLM to know with certainty
+    what data is available from each endpoint.
+
+    :param endpoint_name: Name of the endpoint from FMP_REGISTRY.
+    :return: Sorted list of field names, or empty list if not found.
+    :example: get_endpoint_fields('income_statement')
+    :example: get_endpoint_fields('key_metrics')
+    """
+    try:
+        from fmpsdk.fmp_endpoint_fields import FMP_ENDPOINT_FIELDS
+
+        return FMP_ENDPOINT_FIELDS.get(endpoint_name, [])
+    except ImportError:
+        # Field inventory not yet generated
+        return []
+
+
+def get_fields_for_llm(
+    endpoint_names: Optional[List[str]] = None,
+    max_fields_per_endpoint: int = 15,
+) -> str:
+    """
+    Get compact field listing for schema planning LLM context.
+
+    GEN-127: Formats endpoint fields in a token-efficient way for LLM prompts,
+    showing a preview of fields with counts for longer field lists.
+
+    Example output:
+        ## income_statement
+        date, symbol, revenue, grossProfit, netIncome, eps, ebitda... (+31 more)
+
+        ## balance_sheet_statement
+        date, symbol, totalAssets, totalLiabilities, cash... (+49 more)
+
+    :param endpoint_names: Optional list of specific endpoints. If None, includes all.
+    :param max_fields_per_endpoint: Maximum fields to show before truncating. Default 15.
+    :return: Markdown-formatted string suitable for LLM context.
+    :example: get_fields_for_llm(['income_statement', 'balance_sheet_statement'])
+    :example: get_fields_for_llm(max_fields_per_endpoint=10)
+    """
+    try:
+        from fmpsdk.fmp_endpoint_fields import FMP_ENDPOINT_FIELDS
+    except ImportError:
+        return "# FMP ENDPOINT FIELDS\n\n_Field inventory not yet generated. Run build_fmp_field_inventory.py_"
+
+    lines = [
+        "# FMP ENDPOINT FIELDS (Deterministic)",
+        "",
+        "_Auto-generated via API introspection. These are the exact fields returned by each endpoint._",
+        "",
+    ]
+
+    # Determine which endpoints to include
+    if endpoint_names:
+        endpoints = [e for e in endpoint_names if e in FMP_ENDPOINT_FIELDS]
+    else:
+        endpoints = sorted(FMP_ENDPOINT_FIELDS.keys())
+
+    for endpoint in endpoints:
+        fields = FMP_ENDPOINT_FIELDS.get(endpoint, [])
+        if not fields:
+            continue
+
+        # Show first N fields + count of remaining
+        preview_fields = fields[:max_fields_per_endpoint]
+        preview = ", ".join(preview_fields)
+
+        if len(fields) > max_fields_per_endpoint:
+            remaining = len(fields) - max_fields_per_endpoint
+            preview += f"... (+{remaining} more)"
+
+        lines.append(f"## {endpoint}")
+        lines.append(f"_{len(fields)} fields_")
+        lines.append(f"{preview}")
+        lines.append("")
+
+    return "\n".join(lines)
+
+
+def get_field_inventory_summary() -> Dict[str, Any]:
+    """
+    Get summary statistics about the field inventory.
+
+    GEN-127: Provides metadata about the introspected field inventory
+    for monitoring and debugging purposes.
+
+    :return: Dict with inventory statistics.
+    :example: get_field_inventory_summary()
+    """
+    try:
+        from fmpsdk.fmp_endpoint_fields import FMP_ENDPOINT_FIELDS
+    except ImportError:
+        return {
+            "generated": False,
+            "total_endpoints": 0,
+            "total_fields": 0,
+            "endpoints_with_fields": [],
+        }
+
+    total_fields = sum(len(fields) for fields in FMP_ENDPOINT_FIELDS.values())
+    avg_fields = total_fields / len(FMP_ENDPOINT_FIELDS) if FMP_ENDPOINT_FIELDS else 0
+
+    # Top endpoints by field count
+    sorted_by_count = sorted(
+        FMP_ENDPOINT_FIELDS.items(), key=lambda x: len(x[1]), reverse=True
+    )
+
+    return {
+        "generated": True,
+        "total_endpoints": len(FMP_ENDPOINT_FIELDS),
+        "total_fields": total_fields,
+        "average_fields_per_endpoint": round(avg_fields, 1),
+        "top_5_by_field_count": [
+            {"endpoint": name, "field_count": len(fields)}
+            for name, fields in sorted_by_count[:5]
+        ],
+        "coverage_vs_registry": f"{len(FMP_ENDPOINT_FIELDS)}/{len(FMP_REGISTRY)} ({100*len(FMP_ENDPOINT_FIELDS)/len(FMP_REGISTRY):.1f}%)",
+    }

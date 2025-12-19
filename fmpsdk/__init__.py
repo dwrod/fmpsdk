@@ -223,6 +223,10 @@ from .fmp_registry import (
     get_registry_for_llm,
     get_compact_registry_for_llm,
     search_endpoints,
+    # GEN-127: Field inventory accessors
+    get_endpoint_fields,
+    get_fields_for_llm,
+    get_field_inventory_summary,
 )
 
 from .url_methods import FMPAPIError
@@ -411,4 +415,8 @@ __all__ = [
     "get_registry_for_llm",
     "get_compact_registry_for_llm",
     "search_endpoints",
+    # GEN-127: Field inventory exports
+    "get_endpoint_fields",
+    "get_fields_for_llm",
+    "get_field_inventory_summary",
 ]
